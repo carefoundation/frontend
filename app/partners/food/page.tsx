@@ -260,7 +260,7 @@ export default function FoodPartnersPage() {
         <Card className="p-8 bg-gradient-to-r from-[#10b981] to-[#059669] text-white text-center">
           <h2 className="text-3xl font-bold mb-4">Become a Food Partner</h2>
           <p className="text-green-100 mb-6 text-lg">
-            Join us in the fight against hunger. Partner with Care Foundation Trust to make a difference.
+            Join us in the fight against hunger. Partner with Care Foundation Trust® to make a difference.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/become-partner">

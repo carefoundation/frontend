@@ -60,7 +60,7 @@ const CertificateTemplate = forwardRef<HTMLDivElement, CertificateTemplateProps>
             {/* Description Body */}
             <div className="max-w-4xl text-[#4b5563] text-base leading-loose font-medium uppercase tracking-wide">
                 <p>
-                    For outstanding support to the <span className="text-[#365314] font-bold">Care Foundation Trust</span>.
+                    For outstanding support to the <span className="text-[#365314] font-bold">Care Foundation Trust®</span>.
                 </p>
                 <p>
                     In recognition of their selfless dedication and voluntary service{certificate.hoursCompleted ? ` of ${certificate.hoursCompleted} hours` : ''}.
@@ -75,14 +75,14 @@ const CertificateTemplate = forwardRef<HTMLDivElement, CertificateTemplateProps>
             <div className="flex flex-col items-center w-64">
                 <div className="h-16 w-full border-b-2 border-[#1f2937] mb-2"></div>
                 <p className="font-bold text-[#365314] text-sm uppercase tracking-wider">Authorized Signatory</p>
-                <p className="text-[10px] text-[#6b7280] uppercase tracking-widest font-bold">Care Foundation Trust</p>
+                <p className="text-[10px] text-[#6b7280] uppercase tracking-widest font-bold">Care Foundation Trust®</p>
             </div>
 
             {/* Brand Area */}
             <div className="flex flex-col items-end">
                  <div className="flex items-center gap-4 opacity-80">
                     <div className="text-right">
-                        <p className="font-bold text-[#365314] text-lg uppercase leading-none">Care Foundation Trust</p>
+                        <p className="font-bold text-[#365314] text-lg uppercase leading-none">Care Foundation Trust®</p>
                         <p className="text-[10px] text-[#6b7280] uppercase tracking-widest font-bold mt-1">Est. 1997</p>
                     </div>
                     <img src="/Logo.png" alt="Logo" className="w-12 h-12 object-contain grayscale opacity-50" />

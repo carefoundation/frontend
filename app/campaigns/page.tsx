@@ -2,10 +2,12 @@
 
 import { useState, useEffect } from 'react';
 import { Search, Filter, SortAsc, Loader2 } from 'lucide-react';
-import Footer from '@/components/layout/Footer';
-import CampaignCard from '@/components/campaigns/CampaignCard';
+import dynamic from 'next/dynamic';
 import Button from '@/components/ui/Button';
 import { api, ApiError } from '@/lib/api';
+
+const Footer = dynamic(() => import('@/components/layout/Footer'), { ssr: false });
+const CampaignCard = dynamic(() => import('@/components/campaigns/CampaignCard'), { ssr: false });
 
 export default function CampaignsPage() {
   const [searchQuery, setSearchQuery] = useState('');

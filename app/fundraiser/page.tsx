@@ -2,12 +2,14 @@
 
 import { useState, useEffect } from 'react';
 import { Search, Filter, SortAsc, TrendingUp, Clock, Users, Loader2 } from 'lucide-react';
-import Footer from '@/components/layout/Footer';
-import CampaignCard from '@/components/campaigns/CampaignCard';
+import dynamic from 'next/dynamic';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import Link from 'next/link';
 import { api, ApiError } from '@/lib/api';
+
+const Footer = dynamic(() => import('@/components/layout/Footer'), { ssr: false });
+const CampaignCard = dynamic(() => import('@/components/campaigns/CampaignCard'), { ssr: false });
 
 export default function FundraiserPage() {
   const [searchQuery, setSearchQuery] = useState('');

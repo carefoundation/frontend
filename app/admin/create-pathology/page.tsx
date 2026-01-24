@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { Microscope, Upload, FileText, AlertTriangle, MapPin, User, CreditCard, Loader2 } from 'lucide-react';
+import { Microscope, Upload, FileText, AlertTriangle, MapPin, User, CreditCard, Loader2, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { api, ApiError } from '@/lib/api';
 import { showToast } from '@/lib/toast';
+import TimingSelector from '@/components/admin/TimingSelector';
 
 const indianStates = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -51,6 +52,11 @@ export default function CreatePathologyPage() {
     contactPhone: '',
     contactEmail: '',
     operatingHours: '',
+    timing: {
+      morning: { from: '', to: '', days: [] as string[] },
+      evening: { from: '', to: '', days: [] as string[] },
+      night: { from: '', to: '', days: [] as string[] },
+    },
     gstNumber: '',
     panNumber: '',
     accountNumber: '',
@@ -124,6 +130,7 @@ export default function CreatePathologyPage() {
         formData: {
           testTypes: formData.testTypes,
           operatingHours: formData.operatingHours,
+          timing: formData.timing,
           gstNumber: formData.gstNumber,
           panNumber: formData.panNumber,
           accountNumber: formData.accountNumber,
@@ -173,6 +180,11 @@ export default function CreatePathologyPage() {
         agreeAdminCharges: '',
         agreeWeeklyReimbursement: '',
         agreeTerms: '',
+        timing: {
+          morning: { from: '', to: '', days: [] as string[] },
+          evening: { from: '', to: '', days: [] as string[] },
+          night: { from: '', to: '', days: [] as string[] },
+        },
       });
       setFiles({ banner: null, businessLicense: null, labLicense: null, labImages: [] });
       } else {
@@ -307,17 +319,23 @@ export default function CreatePathologyPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-semibold text-gray-900 mb-2">
-                    Operating Hours
+                  <label className="block text-sm font-semibold text-gray-900 mb-4">
+                    Operating Hours / Timing
                   </label>
-                  <input
-                    type="text"
-                    name="operatingHours"
-                    value={formData.operatingHours}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent bg-white"
-                    placeholder="e.g., 8:00 AM - 8:00 PM"
+                  <TimingSelector
+                    value={formData.timing}
+                    onChange={(timing) => setFormData(prev => ({ ...prev, timing }))}
                   />
+                  <div className="mt-2">
+                    <input
+                      type="text"
+                      name="operatingHours"
+                      value={formData.operatingHours}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent bg-white"
+                      placeholder="Or enter simple text format (e.g., 8:00 AM - 8:00 PM)"
+                    />
+                  </div>
                 </div>
 
                 <div>
@@ -479,10 +497,10 @@ export default function CreatePathologyPage() {
               </div>
             </div>
 
-            {/* Fees For Care Foundation Trust */}
+            {/* Fees For Care Foundation Trust® */}
             <div>
               <label className="block text-sm font-bold text-gray-900 mb-2">
-                Fees For Care Foundation Trust
+                Fees For Care Foundation Trust®
               </label>
               <input
                 type="text"
@@ -675,7 +693,7 @@ export default function CreatePathologyPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-3">
-                  1. Do You Agree To Pay Care Foundation Trust 20% Admin Charges?
+                  1.Every registered restaurant must honor Care Foundation Trust customer coupons,<br /> created as per prior understanding and the enclosed menu.?
                 </label>
                 <div className="flex items-center gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -705,7 +723,7 @@ export default function CreatePathologyPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-3">
-                  2. Do You Agree For Weekly Reimbursement?
+                  2.THE CARE FOUNDATION TRUST USERS HAVE TO BE TREATED AS REGULAR CUSTOMERS AND FEED WELL.?
                 </label>
                 <div className="flex items-center gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -735,7 +753,7 @@ export default function CreatePathologyPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-3">
-                  3. I agree to the above Terms and Conditions
+                  3. Any dispute between the restaurant and Care Foundation Trust shall be referred to arbitration by the Care Foundation Trust Committee.
                 </label>
                 <div className="flex items-center gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">

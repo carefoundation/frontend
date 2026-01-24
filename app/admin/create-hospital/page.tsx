@@ -4,10 +4,11 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { Building2, Upload, MapPin, User, FileText, CreditCard, Loader2 } from 'lucide-react';
+import { Building2, Upload, MapPin, User, FileText, CreditCard, Loader2, Clock } from 'lucide-react';
 import Link from 'next/link';
 import { api, ApiError } from '@/lib/api';
 import { showToast } from '@/lib/toast';
+import TimingSelector from '@/components/admin/TimingSelector';
 
 const indianStates = [
   'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
@@ -52,6 +53,11 @@ export default function CreateHospitalPage() {
     ifscCode: '',
     bankName: '',
     accountHolderName: '',
+    timing: {
+      morning: { from: '', to: '', days: [] as string[] },
+      evening: { from: '', to: '', days: [] as string[] },
+      night: { from: '', to: '', days: [] as string[] },
+    },
   });
 
   const [files, setFiles] = useState({
@@ -112,6 +118,7 @@ export default function CreateHospitalPage() {
         status: isAdmin ? 'approved' : 'pending', // Admin creates are auto-approved, users need approval
         formData: {
           bedCapacity: formData.bedCapacity,
+          timing: formData.timing,
           contactName: formData.contactName,
           contactDesignation: formData.contactDesignation,
           contactPhone: formData.contactPhone,
@@ -152,6 +159,11 @@ export default function CreateHospitalPage() {
           ifscCode: '',
           bankName: '',
           accountHolderName: '',
+          timing: {
+            morning: { from: '', to: '', days: [] as string[] },
+            evening: { from: '', to: '', days: [] as string[] },
+            night: { from: '', to: '', days: [] as string[] },
+          },
         });
         setFiles({
           businessLicense: null,
@@ -433,6 +445,18 @@ export default function CreateHospitalPage() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Operating Hours / Timing */}
+            <div>
+              <h3 className="text-xl font-bold text-gray-900 mb-5 flex items-center gap-2">
+                <Clock className="h-5 w-5 text-[#10b981]" />
+                Operating Hours / Timing
+              </h3>
+              <TimingSelector
+                value={formData.timing}
+                onChange={(timing) => setFormData(prev => ({ ...prev, timing }))}
+              />
             </div>
 
             {/* Documents */}

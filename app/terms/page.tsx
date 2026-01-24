@@ -9,12 +9,12 @@ export default function TermsPage() {
     {
       icon: FileText,
       title: 'Acceptance of Terms',
-      content: `By accessing and using the Care Foundation Trust website and services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.`,
+      content: `By accessing and using the Care Foundation Trust® website and services, you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.`,
     },
     {
       icon: Shield,
       title: 'Use License',
-      content: `Permission is granted to temporarily download one copy of the materials on Care Foundation Trust's website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
+      content: `Permission is granted to temporarily download one copy of the materials on Care Foundation Trust®'s website for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
       • Modify or copy the materials
       • Use the materials for any commercial purpose or for any public display
       • Attempt to decompile or reverse engineer any software contained on the website
@@ -28,7 +28,7 @@ export default function TermsPage() {
     {
       icon: AlertCircle,
       title: 'Disclaimer',
-      content: `The materials on Care Foundation Trust's website are provided on an 'as is' basis. Care Foundation Trust makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.`,
+      content: `The materials on Care Foundation Trust®'s website are provided on an 'as is' basis. Care Foundation Trust® makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.`,
     },
   ];
 
@@ -75,14 +75,14 @@ export default function TermsPage() {
         <Card className="p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Intellectual Property</h2>
           <p className="text-gray-600 leading-relaxed">
-            All content on this website, including text, graphics, logos, images, and software, is the property of Care Foundation Trust or its content suppliers and is protected by Indian and international copyright laws. You may not reproduce, distribute, or transmit any content from this website without prior written permission.
+            All content on this website, including text, graphics, logos, images, and software, is the property of Care Foundation Trust® or its content suppliers and is protected by Indian and international copyright laws. You may not reproduce, distribute, or transmit any content from this website without prior written permission.
           </p>
         </Card>
 
         <Card className="p-6 mb-8">
           <h2 className="text-xl font-bold text-gray-900 mb-4">Limitation of Liability</h2>
           <p className="text-gray-600 leading-relaxed">
-            In no event shall Care Foundation Trust or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Care Foundation Trust's website, even if Care Foundation Trust or a Care Foundation Trust authorized representative has been notified orally or in writing of the possibility of such damage.
+            In no event shall Care Foundation Trust® or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Care Foundation Trust®'s website, even if Care Foundation Trust® or a Care Foundation Trust® authorized representative has been notified orally or in writing of the possibility of such damage.
           </p>
         </Card>
 

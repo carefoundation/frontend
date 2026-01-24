@@ -801,10 +801,10 @@ export default function CreateDoctorPage() {
               </div>
             </div>
 
-            {/* Fees For Care Foundation Trust */}
+            {/* Fees For Care Foundation Trust® */}
             <div>
               <label className="block text-sm font-bold text-gray-900 mb-2">
-                Fees For Care Foundation Trust
+                Fees For Care Foundation Trust®
               </label>
               <input
                 type="text"
@@ -909,7 +909,7 @@ export default function CreateDoctorPage() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-3">
-                  1. Do You Agree To Pay Care Foundation Trust 20% Admin Charges?
+                  1. Every registered restaurant must honor Care Foundation Trust customer coupons, <br />created as per prior understanding and the enclosed menu.?
                 </label>
                 <div className="flex items-center gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -939,7 +939,7 @@ export default function CreateDoctorPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-3">
-                  2. Do You Agree For Weekly Reimbursement?
+                  2.THE CARE FOUNDATION TRUST USERS HAVE TO BE TREATED AS REGULAR CUSTOMERS AND FEED WELL.?
                 </label>
                 <div className="flex items-center gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">
@@ -969,8 +969,9 @@ export default function CreateDoctorPage() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-900 mb-3">
-                  3. I agree to the above Terms and Conditions
+                  3. Any dispute between the restaurant and Care Foundation Trust shall be <br />referred to arbitration by the Care Foundation Trust Committee.
                 </label>
+
                 <div className="flex items-center gap-6">
                   <label className="flex items-center gap-2 cursor-pointer">
                     <input
@@ -995,8 +996,11 @@ export default function CreateDoctorPage() {
                     <span className="text-gray-700">No</span>
                   </label>
                 </div>
+
+                
               </div>
             </div>
+
 
             {/* Submit Button */}
             <div className="flex gap-4 pt-4">

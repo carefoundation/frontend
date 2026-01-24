@@ -30,12 +30,12 @@ export default function Footer() {
                 <Heart className="h-8 w-8 text-white fill-white" />
               </div>
               <div>
-                <div className="text-gray-900 font-bold text-lg">Care Foundation Trust</div>
+                <div className="text-gray-900 font-bold text-lg">Care Foundation Trust®</div>
                 <div className="text-gray-600 text-sm">Est Since 1997</div>
               </div>
             </Link>
             <p className="text-gray-600 mb-6 text-sm leading-relaxed">
-              Care Foundation Trust is a non-profit organisation committed to compassion and empathy. Our goal is to address critical social issues and uplift lives.
+              Care Foundation Trust® is a non-profit organisation committed to compassion and empathy. Our goal is to address critical social issues and uplift lives.
             </p>
             <div className="flex gap-3">
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors border border-gray-300 cursor-pointer">
@@ -181,7 +181,7 @@ export default function Footer() {
         </div>
         
         <div className="border-t border-gray-300 mt-8 pt-8 text-center text-gray-600 text-sm">
-          <p>&copy; {currentYear ?? new Date().getFullYear()} Care Foundation Trust. All rights reserved.</p>
+          <p>&copy; {currentYear ?? new Date().getFullYear()} Care Foundation Trust®. All rights reserved.</p>
         </div>
       </div>
     </footer>

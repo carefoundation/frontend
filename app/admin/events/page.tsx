@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { api, ApiError } from '@/lib/api';
 import { showToast } from '@/lib/toast';
 import ConfirmModal from '@/components/ui/ConfirmModal';
+import ViewModal from '@/components/admin/ViewModal';
+import EditModal from '@/components/admin/EditModal';
 
 interface Event {
   _id?: string;
@@ -21,13 +23,19 @@ interface Event {
   category?: string;
   status: 'upcoming' | 'ongoing' | 'completed';
   createdAt?: string;
+  expectedAttendees?: number;
+  time?: string;
 }
 
 export default function EventsPage() {
   const [events, setEvents] = useState<Event[]>([]);
+  const [fullEvents, setFullEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [selectedFullEvent, setSelectedFullEvent] = useState<any | null>(null);
   const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
@@ -39,19 +47,25 @@ export default function EventsPage() {
       setLoading(true);
       const response = await api.get<Event[]>('/events');
       if (Array.isArray(response)) {
+        // Store full event data
+        setFullEvents(response);
+        
         const formatted = response.map((event: any) => ({
           id: event._id || event.id,
           _id: event._id,
           title: event.title || 'Untitled',
-          startDate: event.startDateTime ? new Date(event.startDateTime).toLocaleDateString() : (event.startDate || 'N/A'),
-          endDate: event.endDateTime ? new Date(event.endDateTime).toLocaleDateString() : (event.endDate || 'N/A'),
+          startDate: event.startDateTime ? new Date(event.startDateTime).toLocaleDateString() : (event.startDate ? new Date(event.startDate).toLocaleDateString() : 'N/A'),
+          endDate: event.endDateTime ? new Date(event.endDateTime).toLocaleDateString() : (event.endDate ? new Date(event.endDate).toLocaleDateString() : 'N/A'),
           location: event.location || 'N/A',
           category: event.category || 'General',
           status: event.status || 'upcoming',
+          expectedAttendees: event.expectedAttendees || 0,
+          time: event.time || '',
         }));
         setEvents(formatted);
       } else {
         setEvents([]);
+        setFullEvents([]);
       }
     } catch (error) {
       if (error instanceof ApiError && error.status === 401) {
@@ -60,14 +74,68 @@ export default function EventsPage() {
         console.error('Failed to fetch events:', error);
       }
       setEvents([]);
+      setFullEvents([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleViewClick = (event: Event) => {
+    const fullEvent = fullEvents.find(e => (e._id || e.id) === (event._id || event.id));
+    if (fullEvent) {
+      setSelectedFullEvent(fullEvent);
+      setViewModalOpen(true);
+    }
+  };
+
+  const handleEditClick = (event: Event) => {
+    const fullEvent = fullEvents.find(e => (e._id || e.id) === (event._id || event.id));
+    if (fullEvent) {
+      setSelectedFullEvent(fullEvent);
+      setEditModalOpen(true);
     }
   };
 
   const handleDeleteClick = (event: Event) => {
     setSelectedEvent(event);
     setDeleteModalOpen(true);
+  };
+
+  const handleUpdateEvent = async (data: Record<string, any>) => {
+    if (!selectedFullEvent || !(selectedFullEvent._id || selectedFullEvent.id)) {
+      return;
+    }
+
+    try {
+      const id = selectedFullEvent._id || selectedFullEvent.id;
+      setUpdating(String(id));
+      
+      // Format dates properly
+      const updateData: any = { ...data };
+      if (updateData.startDate) {
+        updateData.startDate = new Date(updateData.startDate).toISOString();
+      }
+      if (updateData.endDate) {
+        updateData.endDate = new Date(updateData.endDate).toISOString();
+      }
+      if (updateData.expectedAttendees) {
+        updateData.expectedAttendees = parseInt(updateData.expectedAttendees);
+      }
+
+      await api.put(`/events/${id}`, updateData);
+      showToast('Event updated successfully!', 'success');
+      await fetchEvents();
+      setEditModalOpen(false);
+      setSelectedFullEvent(null);
+    } catch (error) {
+      if (error instanceof ApiError && error.status === 401) {
+        window.location.href = '/login';
+      } else {
+        showToast('Failed to update event', 'error');
+      }
+    } finally {
+      setUpdating(null);
+    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -110,8 +178,14 @@ export default function EventsPage() {
       accessor: 'startDate' as keyof Event,
     },
     {
-      header: 'End Date',
-      accessor: 'endDate' as keyof Event,
+      header: 'Time',
+      accessor: 'time' as keyof Event,
+      render: (value: string) => value || 'N/A',
+    },
+    {
+      header: 'Expected Attendees',
+      accessor: 'expectedAttendees' as keyof Event,
+      render: (value: number) => value || 0,
     },
     {
       header: 'Location',
@@ -159,10 +233,21 @@ export default function EventsPage() {
         data={events}
         actions={(row) => (
           <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-            <Button variant="ghost" size="sm" title="View">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              title="View"
+              onClick={() => handleViewClick(row)}
+            >
               <Eye className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm" title="Edit">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              title="Edit"
+              onClick={() => handleEditClick(row)}
+              disabled={updating === (row._id || row.id)}
+            >
               <Edit className="h-4 w-4" />
             </Button>
             <Button 
@@ -178,6 +263,72 @@ export default function EventsPage() {
           </div>
         )}
       />
+
+      {/* View Modal */}
+      {selectedFullEvent && (
+        <ViewModal
+          isOpen={viewModalOpen}
+          onClose={() => {
+            setViewModalOpen(false);
+            setSelectedFullEvent(null);
+          }}
+          title={`Event Details: ${selectedFullEvent.title || 'Untitled'}`}
+          data={selectedFullEvent}
+        />
+      )}
+
+      {/* Edit Modal */}
+      {selectedFullEvent && (
+        <EditModal
+          isOpen={editModalOpen}
+          onClose={() => {
+            setEditModalOpen(false);
+            setSelectedFullEvent(null);
+          }}
+          title={`Edit Event: ${selectedFullEvent.title || 'Untitled'}`}
+          fields={[
+            { key: 'title', label: 'Title', type: 'text' },
+            { key: 'description', label: 'Description', type: 'textarea' },
+            { key: 'startDate', label: 'Start Date', type: 'date' },
+            { key: 'endDate', label: 'End Date', type: 'date' },
+            { key: 'location', label: 'Location', type: 'text' },
+            { key: 'address', label: 'Address', type: 'textarea' },
+            { key: 'city', label: 'City', type: 'text' },
+            { key: 'state', label: 'State', type: 'text' },
+            { key: 'category', label: 'Category', type: 'select', options: [
+              { value: 'Volunteer', label: 'Volunteer' },
+              { value: 'Fundraising', label: 'Fundraising' },
+              { value: 'Community', label: 'Community' },
+              { value: 'Health', label: 'Health' },
+              { value: 'Education', label: 'Education' },
+              { value: 'Other', label: 'Other' },
+            ]},
+            { key: 'expectedAttendees', label: 'Expected Attendees', type: 'number' },
+            { key: 'time', label: 'Time', type: 'time' },
+            { key: 'status', label: 'Status', type: 'select', options: [
+              { value: 'upcoming', label: 'Upcoming' },
+              { value: 'ongoing', label: 'Ongoing' },
+              { value: 'completed', label: 'Completed' },
+              { value: 'cancelled', label: 'Cancelled' },
+            ]},
+          ]}
+          initialData={{
+            title: selectedFullEvent.title || '',
+            description: selectedFullEvent.description || '',
+            startDate: selectedFullEvent.startDate ? new Date(selectedFullEvent.startDate).toISOString().split('T')[0] : '',
+            endDate: selectedFullEvent.endDate ? new Date(selectedFullEvent.endDate).toISOString().split('T')[0] : '',
+            location: selectedFullEvent.location || '',
+            address: selectedFullEvent.address || '',
+            city: selectedFullEvent.city || '',
+            state: selectedFullEvent.state || '',
+            category: selectedFullEvent.category || '',
+            expectedAttendees: selectedFullEvent.expectedAttendees || 0,
+            time: selectedFullEvent.time || '',
+            status: selectedFullEvent.status || 'upcoming',
+          }}
+          onSave={handleUpdateEvent}
+        />
+      )}
 
       {/* Delete Modal */}
       {selectedEvent && (

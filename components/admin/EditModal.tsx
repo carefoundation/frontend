@@ -11,7 +11,7 @@ interface EditModalProps {
   fields: {
     key: string;
     label: string;
-    type?: 'text' | 'email' | 'number' | 'select' | 'textarea';
+    type?: 'text' | 'email' | 'number' | 'select' | 'textarea' | 'date' | 'time';
     options?: { value: string; label: string }[];
   }[];
   initialData: Record<string, any>;
@@ -95,6 +95,24 @@ export default function EditModal({
                         </option>
                       ))}
                     </select>
+                  ) : field.type === 'date' ? (
+                    <input
+                      type="date"
+                      value={formData[field.key] || ''}
+                      onChange={(e) =>
+                        setFormData({ ...formData, [field.key]: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
+                    />
+                  ) : field.type === 'time' ? (
+                    <input
+                      type="time"
+                      value={formData[field.key] || ''}
+                      onChange={(e) =>
+                        setFormData({ ...formData, [field.key]: e.target.value })
+                      }
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
+                    />
                   ) : (
                     <input
                       type={field.type || 'text'}

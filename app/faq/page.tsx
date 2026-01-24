@@ -18,7 +18,7 @@ export default function FAQPage() {
         },
         {
           question: 'Is my donation tax-deductible?',
-          answer: 'Yes, Care Foundation Trust is registered under Section 80G of the Income Tax Act, 1961. Donations made to us are eligible for tax deduction up to 50% of the donated amount, subject to certain limits. You will receive a receipt via email that can be used for tax purposes.',
+          answer: 'Yes, Care Foundation Trust® is registered under Section 80G of the Income Tax Act, 1961. Donations made to us are eligible for tax deduction up to 50% of the donated amount, subject to certain limits. You will receive a receipt via email that can be used for tax purposes.',
         },
         {
           question: 'Can I donate anonymously?',
@@ -88,8 +88,8 @@ export default function FAQPage() {
       category: 'General',
       questions: [
         {
-          question: 'How is Care Foundation Trust funded?',
-          answer: 'Care Foundation Trust is funded through donations from individuals, corporations, and grants. We maintain complete transparency about our funding sources and how funds are utilized.',
+          question: 'How is Care Foundation Trust® funded?',
+          answer: 'Care Foundation Trust® is funded through donations from individuals, corporations, and grants. We maintain complete transparency about our funding sources and how funds are utilized.',
         },
         {
           question: 'How do you ensure transparency?',
@@ -100,12 +100,12 @@ export default function FAQPage() {
           answer: 'Yes, you are welcome to visit our office. Our address is: 1106, Alexander Tower, Sai World Empire, Navi Mumbai - 410210. Please contact us in advance to schedule a visit.',
         },
         {
-          question: 'How can I partner with Care Foundation Trust?',
+          question: 'How can I partner with Care Foundation Trust®?',
           answer: 'We welcome partnerships with corporations, NGOs, and other organizations. Please contact us through our "Contact" page or email us at carefoundationtrustorg@gmail.com with your partnership proposal.',
         },
         {
-          question: 'Is Care Foundation Trust a registered organization?',
-          answer: 'Yes, Care Foundation Trust is a registered public charitable trust under the Indian Trusts Act, 1882. We are also registered under Section 12A and 80G of the Income Tax Act. You can view all our certificates on our "Certificates" page.',
+          question: 'Is Care Foundation Trust® a registered organization?',
+          answer: 'Yes, Care Foundation Trust® is a registered public charitable trust under the Indian Trusts Act, 1882. We are also registered under Section 12A and 80G of the Income Tax Act. You can view all our certificates on our "Certificates" page.',
         },
       ],
     },

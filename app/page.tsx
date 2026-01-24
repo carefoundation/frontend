@@ -5,12 +5,14 @@ import Image from 'next/image';
 import { Heart, TrendingUp, Users, Target, ArrowRight, CheckCircle, Star, User, Mail, Phone, Map, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import Footer from '@/components/layout/Footer';
+import dynamic from 'next/dynamic';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
-import CampaignCard from '@/components/campaigns/CampaignCard';
-import VideoImageSlider from '@/components/ui/VideoImageSlider';
 import { showToast } from '@/lib/toast';
+
+const Footer = dynamic(() => import('@/components/layout/Footer'), { ssr: false });
+const CampaignCard = dynamic(() => import('@/components/campaigns/CampaignCard'), { ssr: false });
+const VideoImageSlider = dynamic(() => import('@/components/ui/VideoImageSlider'), { ssr: false });
 
 export default function Home() {
   const router = useRouter();

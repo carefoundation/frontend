@@ -15,7 +15,7 @@ export default function FounderPage() {
             <User className="h-16 w-16 text-[#10b981] mx-auto mb-6" />
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Founder</h1>
             <p className="text-xl text-gray-600">
-              Meet the visionary behind Care Foundation Trust
+              Meet the visionary behind Care Foundation Trust®
             </p>
           </div>
 
@@ -35,7 +35,7 @@ export default function FounderPage() {
                 <h2 className="text-3xl font-bold text-gray-900 mb-4">Aziz Gheewala</h2>
                 <p className="text-lg text-[#10b981] font-semibold mb-4">Founder & CEO, Care Foundation Trust®️</p>
                 <p className="text-gray-600 leading-relaxed mb-6">
-                  Welcome to Care Foundation Trust. Since 1997, we have been committed to making a meaningful difference in the lives of those in need through transparent donations, volunteer support, and meaningful partnerships.
+                  Welcome to Care Foundation Trust®. Since 1997, we have been committed to making a meaningful difference in the lives of those in need through transparent donations, volunteer support, and meaningful partnerships.
                 </p>
                 <div className="flex gap-4">
                   <a href="mailto:carefoundationtrustorg@gmail.com" className="p-3 bg-[#10b981] text-white rounded-lg hover:bg-[#059669] transition-colors">
@@ -54,7 +54,7 @@ export default function FounderPage() {
             <h3 className="text-2xl font-bold text-gray-900 mb-6">About the Founder</h3>
             <div className="space-y-4 text-gray-700 leading-relaxed">
               <p>
-                Since 1997, Care Foundation Trust has been committed to making a meaningful difference in the lives of those in need. Our mission is to address critical social issues and uplift lives through compassion, empathy, and dedicated service. With over two decades of service, we have touched thousands of lives through our various programs including food relief, medical assistance, education support, and community development initiatives. Every donation, every volunteer, and every partner contributes to our shared vision of a better, more compassionate world.
+                Since 1997, Care Foundation Trust® has been committed to making a meaningful difference in the lives of those in need. Our mission is to address critical social issues and uplift lives through compassion, empathy, and dedicated service. With over two decades of service, we have touched thousands of lives through our various programs including food relief, medical assistance, education support, and community development initiatives. Every donation, every volunteer, and every partner contributes to our shared vision of a better, more compassionate world.
               </p>
             </div>
           </Card>

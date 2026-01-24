@@ -72,6 +72,16 @@ async function request<T>(endpoint: string, options: RequestInit = {}): Promise<
     if (error instanceof ApiError) {
       throw error;
     }
+    // Handle connection refused and network errors
+    if (error instanceof TypeError) {
+      if (error.message.includes('fetch') || error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        throw new ApiError('Cannot connect to server. Please make sure the backend server is running on port 5000.', 0);
+      }
+    }
+    // Check for connection refused in error message
+    if (error instanceof Error && (error.message.includes('ERR_CONNECTION_REFUSED') || error.message.includes('connection refused'))) {
+      throw new ApiError('Backend server is not running. Please start the server on port 5000.', 0);
+    }
     const errorMsg = error instanceof Error ? error.message : 'Network error';
     throw new ApiError(errorMsg, 0);
   }

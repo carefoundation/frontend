@@ -116,7 +116,7 @@ export default function BecomePartnerPage() {
             <Handshake className="h-16 w-16 text-[#10b981] mx-auto mb-6" />
             <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Become a Partner</h1>
             <p className="text-xl text-gray-600">
-              Join hands with Care Foundation Trust to create a greater impact. Together we can make a difference.
+              Join hands with Care Foundation Trust® to create a greater impact. Together we can make a difference.
             </p>
           </div>
 

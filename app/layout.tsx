@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import WhatsAppButton from "@/components/ui/WhatsAppButton";
 import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
+import dynamic from "next/dynamic";
+import WhatsAppButtonWrapper from "@/components/layout/WhatsAppButtonWrapper";
+
+const Header = dynamic(() => import("@/components/layout/Header"), { ssr: true });
 
 const inter = Inter({
   variable: "--font-geist-sans",
@@ -41,7 +43,7 @@ export default function RootLayout({
       >
         <Header />
         {children}
-        <WhatsAppButton />
+        <WhatsAppButtonWrapper />
       </body>
     </html>
   );

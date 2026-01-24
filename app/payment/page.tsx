@@ -9,6 +9,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import { api, ApiError } from '@/lib/api';
 import { showToast } from '@/lib/toast';
+import Script from 'next/script';
 
 interface DonationData {
   amount: string;
@@ -100,37 +101,139 @@ export default function PaymentPage() {
     }
   }, [paymentTimer, paymentMethod, upiMode]);
 
-  const handlePayment = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleRazorpayPayment = async () => {
     setIsProcessing(true);
+    
+    try {
+      const finalDonorName = donorName || donationData?.name || '';
+      const finalDonorEmail = (donorEmail || donationData?.email || '').trim().toLowerCase();
+      const finalDonorPhone = donorPhone || donationData?.phone || '';
+      
+      if (!finalDonorName || !finalDonorEmail) {
+        showToast('Please provide name and email for donation', 'error');
+        setIsProcessing(false);
+        return;
+      }
+      
+      // Validate email format
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(finalDonorEmail)) {
+        showToast('Please provide a valid email address', 'error');
+        setIsProcessing(false);
+        return;
+      }
 
-    // Validate payment details based on method
-    if (paymentMethod === 'card') {
-      if (!cardNumber || !cardName || !expiry || !cvv) {
-        showToast('Please fill all card details', 'error');
+      const amount = parseFloat(donationData?.amount || '0');
+      if (amount < 1) {
+        showToast('Minimum donation amount is ₹1', 'error');
         setIsProcessing(false);
         return;
       }
-    } else if (paymentMethod === 'upi') {
-      if (upiMode === 'id' && !upiId) {
-        showToast('Please enter your UPI ID', 'error');
-        setIsProcessing(false);
-        return;
+
+      // Create Razorpay order
+      const orderData = await api.post('/razorpay/create-order', {
+        amount: amount,
+        currency: 'INR',
+        receipt: `receipt_${Date.now()}`,
+        notes: {
+          donorName: finalDonorName,
+          donorEmail: finalDonorEmail,
+          campaignId: donationData?.campaignId || null,
+        }
+      });
+
+      // Load Razorpay script if not already loaded
+      if (typeof window !== 'undefined' && !(window as any).Razorpay) {
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        document.body.appendChild(script);
+        await new Promise((resolve) => {
+          script.onload = resolve;
+        });
       }
-      if (upiMode === 'qr' && paymentTimer === 0) {
-        showToast('Payment session expired. Please refresh and try again.', 'error');
-        setIsProcessing(false);
-        return;
+
+      const Razorpay = (window as any).Razorpay;
+
+      const options = {
+        key: orderData.keyId,
+        amount: orderData.amount,
+        currency: orderData.currency,
+        name: 'Care Foundation Trust',
+        description: donationData?.campaignTitle ? `Donation for ${donationData.campaignTitle}` : 'Donation to Care Foundation Trust',
+        order_id: orderData.orderId,
+        prefill: {
+          name: finalDonorName,
+          email: finalDonorEmail,
+          contact: finalDonorPhone || '',
+        },
+        theme: {
+          color: '#10b981',
+        },
+        handler: async function (response: any) {
+          try {
+            // Verify payment on backend
+            const nameParts = finalDonorName.split(' ');
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts.slice(1).join(' ') || '';
+
+            await api.post('/razorpay/verify-payment', {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              amount: amount,
+              firstName: firstName,
+              lastName: lastName || null,
+              email: finalDonorEmail,
+              phoneNumber: finalDonorPhone || null,
+              campaignId: donationData?.campaignId || null,
+              message: 'Donation via Razorpay',
+            });
+
+            // Clear pending donation data
+            if (typeof window !== 'undefined') {
+              localStorage.removeItem('pendingDonation');
+            }
+
+            showToast(`Payment successful! Thank you for your donation of ₹${amount}`, 'success');
+            
+            setTimeout(() => {
+              router.push('/');
+            }, 1500);
+          } catch (error) {
+            console.error('Payment verification error:', error);
+            if (error instanceof ApiError) {
+              showToast(`Payment verification failed: ${error.message}`, 'error');
+            } else {
+              showToast('Payment verification failed. Please contact support.', 'error');
+            }
+          } finally {
+            setIsProcessing(false);
+          }
+        },
+        modal: {
+          ondismiss: function() {
+            setIsProcessing(false);
+          }
+        },
+      };
+
+      const razorpay = new Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      setIsProcessing(false);
+      if (error instanceof ApiError) {
+        showToast(`Payment failed: ${error.message}`, 'error');
+      } else {
+        showToast('Failed to initialize payment. Please try again.', 'error');
       }
-    } else if (paymentMethod === 'netbanking') {
-      if (!bankName) {
-        showToast('Please select a bank', 'error');
-        setIsProcessing(false);
-        return;
-      }
+      console.error('Razorpay initialization error:', error);
     }
+  };
 
-    // Submit donation to backend
+  const handleOtherPayment = async () => {
+    setIsProcessing(true);
+    
     try {
       const finalDonorName = donorName || donationData?.name || '';
       const finalDonorEmail = (donorEmail || donationData?.email || '').trim().toLowerCase();
@@ -174,7 +277,8 @@ export default function PaymentPage() {
       }
 
       // Show success message
-      showToast(`Payment successful! Thank you for your donation of ₹${donationData?.amount || '0'}`, 'success');
+      const gatewayName = paymentGateway === 'demo' ? 'Demo Payment' : 'Yes Bank';
+      showToast(`Payment successful via ${gatewayName}! Thank you for your donation of ₹${donationData?.amount || '0'}`, 'success');
       
       // Redirect to home page (no login required)
       setTimeout(() => {
@@ -404,67 +508,10 @@ export default function PaymentPage() {
                 <Button
                   type="button"
                   onClick={async () => {
-                    // Process payment
-                    setIsProcessing(true);
-                    
-                    try {
-                      const finalDonorName = donorName || donationData?.name || '';
-                      const finalDonorEmail = (donorEmail || donationData?.email || '').trim().toLowerCase();
-                      const finalDonorPhone = donorPhone || donationData?.phone || '';
-                      
-                      if (!finalDonorName || !finalDonorEmail) {
-                        showToast('Please provide name and email for donation', 'error');
-                        setIsProcessing(false);
-                        return;
-                      }
-                      
-                      // Validate email format
-                      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                      if (!emailRegex.test(finalDonorEmail)) {
-                        showToast('Please provide a valid email address', 'error');
-                        setIsProcessing(false);
-                        return;
-                      }
-                      
-                      const nameParts = finalDonorName.split(' ');
-                      const firstName = nameParts[0] || '';
-                      const lastName = nameParts.slice(1).join(' ') || '';
-
-                      const donationPayload = {
-                        amount: donationData?.amount || '0',
-                        firstName: firstName,
-                        lastName: lastName || null,
-                        email: finalDonorEmail,
-                        phoneNumber: finalDonorPhone || null,
-                        campaignId: donationData?.campaignId || null,
-                        message: `Donation via ${paymentGateway}`,
-                        paymentMethod: paymentGateway,
-                        status: 'completed',
-                      };
-
-                      await api.post('/donations', donationPayload);
-                      
-                      // Clear pending donation data
-                      if (typeof window !== 'undefined') {
-                        localStorage.removeItem('pendingDonation');
-                      }
-
-                      // Show success message
-                      const gatewayName = paymentGateway === 'razorpay' ? 'Razorpay' : paymentGateway === 'demo' ? 'Demo Payment' : 'Yes Bank';
-                      showToast(`Payment successful via ${gatewayName}! Thank you for your donation of ₹${donationData?.amount || '0'}`, 'success');
-                      
-                      // Redirect to home page (no login required)
-                      setTimeout(() => {
-                        router.push('/');
-                      }, 1500);
-                    } catch (error) {
-                      setIsProcessing(false);
-                      if (error instanceof ApiError) {
-                        showToast(`Payment failed: ${error.message}`, 'error');
-                      } else {
-                        showToast('Payment failed. Please try again.', 'error');
-                      }
-                      console.error('Donation submission error:', error);
+                    if (paymentGateway === 'razorpay') {
+                      await handleRazorpayPayment();
+                    } else {
+                      await handleOtherPayment();
                     }
                   }}
                   size="lg"
@@ -472,7 +519,7 @@ export default function PaymentPage() {
                   disabled={isProcessing}
                   isLoading={isProcessing}
                 >
-                  {isProcessing ? 'Processing Payment...' : 'Choose'}
+                  {isProcessing ? 'Processing Payment...' : paymentGateway === 'razorpay' ? 'Pay with Razorpay' : 'Proceed with Payment'}
                   {!isProcessing && <ArrowRight className="ml-2 h-5 w-5 inline" />}
                 </Button>
               </div>
@@ -480,6 +527,10 @@ export default function PaymentPage() {
           </div>
         </div>
       </div>
+      <Script
+        src="https://checkout.razorpay.com/v1/checkout.js"
+        strategy="lazyOnload"
+      />
     </div>
   );
 }

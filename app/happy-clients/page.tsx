@@ -78,7 +78,7 @@ export default function HappyClientsPage() {
           <Heart className="h-16 w-16 text-[#10b981] mx-auto mb-6" />
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Happy Clients</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Read what our donors, beneficiaries, and partners have to say about their experience with Care Foundation Trust.
+            Read what our donors, beneficiaries, and partners have to say about their experience with Care Foundation Trust®.
           </p>
         </div>
 

@@ -4,8 +4,9 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Heart, Mail, Lock, Eye, EyeOff, Shield } from 'lucide-react';
-import Button from '@/components/ui/Button';
-import { isAdmin, setAdminSession, checkAdminSession } from '@/lib/auth';
+import dynamic from 'next/dynamic';
+
+const Button = dynamic(() => import('@/components/ui/Button'), { ssr: false });
 
 export default function LoginPage() {
   const router = useRouter();
@@ -37,7 +38,10 @@ export default function LoginPage() {
     setIsLoading(true);
     
     try {
-      const { api } = await import('@/lib/api');
+      const [{ api }, { setAdminSession }] = await Promise.all([
+        import('@/lib/api'),
+        import('@/lib/auth')
+      ]);
       const response: any = await api.post('/auth/signin', {
         email: formData.email,
         password: formData.password,

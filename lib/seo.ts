@@ -16,7 +16,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://carefoundation.org'
 export function generateMetadata(config: SEOConfig): Metadata {
   const { title, description, canonical, ogImage = defaultOgImage, ogType = 'website', keywords = [], noIndex = false } = config;
 
-  const fullTitle = `${title} | Care Foundation Trust`;
+  const fullTitle = `${title} | Care Foundation Trust®`;
   const canonicalUrl = canonical || siteUrl;
   let ogImageUrl = ogImage;
   if (!ogImage.startsWith('http')) {
@@ -34,7 +34,7 @@ export function generateMetadata(config: SEOConfig): Metadata {
       title: fullTitle,
       description,
       url: canonicalUrl,
-      siteName: 'Care Foundation Trust',
+      siteName: 'Care Foundation Trust®',
       images: [
         {
           url: ogImageUrl,

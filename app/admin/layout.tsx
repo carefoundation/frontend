@@ -1,10 +1,12 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import AdminSidebar from '@/components/admin/AdminSidebar';
-import AdminAuthGuard from '@/components/admin/AdminAuthGuard';
+import dynamic from 'next/dynamic';
 import { SidebarProvider, useSidebar } from '@/contexts/SidebarContext';
 import { clsx } from 'clsx';
+
+const AdminSidebar = dynamic(() => import('@/components/admin/AdminSidebar'), { ssr: false });
+const AdminAuthGuard = dynamic(() => import('@/components/admin/AdminAuthGuard'), { ssr: false });
 
 // Routes that don't require admin sidebar (public partner forms)
 const PUBLIC_ROUTES = [

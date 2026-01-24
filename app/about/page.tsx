@@ -14,7 +14,7 @@ export default function AboutPage() {
   ];
 
   const milestones = [
-    { year: '1997', title: 'Foundation Established', description: 'Care Foundation Trust was founded with a vision to create positive social change.' },
+    { year: '1997', title: 'Foundation Established', description: 'Care Foundation Trust® was founded with a vision to create positive social change.' },
     { year: '2005', title: 'First Major Campaign', description: 'Launched our first large-scale healthcare initiative, impacting 1,000+ lives.' },
     { year: '2010', title: 'Education Programs', description: 'Expanded to include comprehensive education programs for underprivileged children.' },
     { year: '2015', title: 'Digital Platform Launch', description: 'Launched our online platform to reach more donors and beneficiaries.' },
@@ -29,7 +29,7 @@ export default function AboutPage() {
         <div className="text-center mb-16">
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">About Us</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Care Foundation Trust is a non-profit organisation committed to compassion and empathy. 
+            Care Foundation Trust® is a non-profit organisation committed to compassion and empathy. 
             Our goal is to address critical social issues and uplift lives.
           </p>
         </div>
@@ -51,7 +51,7 @@ export default function AboutPage() {
             <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">Our Story</h2>
             <div className="space-y-4 text-gray-700 leading-relaxed">
               <p>
-                Established in 1997, Care Foundation Trust has been at the forefront of social change in India. 
+                Established in 1997, Care Foundation Trust® has been at the forefront of social change in India. 
                 What started as a small initiative to help those in need has grown into a trusted platform that 
                 connects compassionate donors with genuine causes.
               </p>

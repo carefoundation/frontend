@@ -194,15 +194,15 @@ export default function HealthPartnersPage() {
                 <div className="mb-4">
                   <h4 className="text-sm font-semibold text-gray-900 mb-2">Programs:</h4>
                   <div className="flex flex-wrap gap-2">
-                    {partner.programs.slice(0, 4).map((program, index) => (
+                    {Array.isArray(partner.programs) && partner.programs.slice(0, 4).map((program: any, index: number) => (
                       <span
                         key={index}
                         className="px-2 py-1 bg-[#ecfdf5] text-[#10b981] text-xs font-medium rounded"
                       >
-                        {program}
+                        {typeof program === 'string' ? program : (program?.name || program?.title || 'Program')}
                       </span>
                     ))}
-                    {partner.programs.length > 4 && (
+                    {Array.isArray(partner.programs) && partner.programs.length > 4 && (
                       <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded">
                         +{partner.programs.length - 4} more...
                       </span>
@@ -266,7 +266,7 @@ export default function HealthPartnersPage() {
         <Card className="p-8 bg-gradient-to-r from-[#10b981] to-[#059669] text-white text-center">
           <h2 className="text-3xl font-bold mb-4">Become a Health Partner</h2>
           <p className="text-green-100 mb-6 text-lg">
-            Join us in providing quality healthcare to those in need. Partner with Care Foundation Trust today.
+            Join us in providing quality healthcare to those in need. Partner with Care Foundation Trust® today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/become-partner">

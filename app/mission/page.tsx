@@ -56,7 +56,7 @@ export default function MissionPage() {
             <Heart className="h-16 w-16 text-[#10b981] mx-auto mb-6" />
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Mission Statement</h2>
             <p className="text-lg text-gray-700 leading-relaxed mb-4">
-              Care Foundation Trust is committed to addressing critical social issues and uplifting lives through 
+              Care Foundation Trust® is committed to addressing critical social issues and uplifting lives through 
               compassion, empathy, and collective action. We believe that every individual deserves dignity, respect, 
               and the opportunity to thrive.
             </p>

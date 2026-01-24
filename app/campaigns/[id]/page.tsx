@@ -4,12 +4,14 @@ import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import { Clock, Users, MapPin, Share2, Facebook, Twitter, Copy, Heart, CheckCircle, Loader2 } from 'lucide-react';
-import Footer from '@/components/layout/Footer';
+import dynamic from 'next/dynamic';
 import Button from '@/components/ui/Button';
 import ProgressBar from '@/components/ui/ProgressBar';
 import Card from '@/components/ui/Card';
 import { api, ApiError } from '@/lib/api';
 import { showToast } from '@/lib/toast';
+
+const Footer = dynamic(() => import('@/components/layout/Footer'), { ssr: false });
 
 export default function CampaignDetailPage() {
   const router = useRouter();

@@ -22,7 +22,7 @@ const VolunteerCard = forwardRef<HTMLDivElement, VolunteerCardProps>(({ voluntee
         {/* Header Background with Curve */}
         <div className="h-[140px] bg-[#16a34a] relative">
             <div className="absolute inset-0 flex flex-col items-center justify-center text-[#ffffff] z-10 p-4">
-                <h1 className="text-xl font-bold tracking-wide uppercase text-center leading-tight">Care Foundation Trust</h1>
+                <h1 className="text-xl font-bold tracking-wide uppercase text-center leading-tight">Care Foundation Trust®</h1>
                 <p className="text-[10px] opacity-90 mt-1">Reg. No: CFT/2025/029</p>
                 <p className="text-[10px] opacity-90">Head Office: Mumbai - 400003</p>
             </div>
@@ -90,14 +90,14 @@ const VolunteerCard = forwardRef<HTMLDivElement, VolunteerCardProps>(({ voluntee
 
          <div className="p-8 flex-1 flex flex-col">
             <ul className="list-disc pl-4 space-y-3 text-xs text-[#4b5563] leading-relaxed">
-                <li>This card is the property of <strong>Care Foundation Trust</strong>.</li>
+                <li>This card is the property of <strong>Care Foundation Trust®</strong>.</li>
                 <li>This card is non-transferable and must be returned upon request or termination of volunteer service.</li>
                 <li>If found, please return to the address mentioned below or contact us immediately.</li>
                 <li>This card confirms the individual&apos;s role as a volunteer and does not authorize them to collect cash without an official receipt book.</li>
             </ul>
 
             <div className="mt-auto pt-6 border-t border-[#e5e7eb]">
-                <h4 className="text-[#16a34a] font-bold text-sm mb-2">Care Foundation Trust</h4>
+                <h4 className="text-[#16a34a] font-bold text-sm mb-2">Care Foundation Trust®</h4>
                 <p className="text-xs text-[#4b5563] mb-1">
                     <strong>Address:</strong> Shop No - S - 61, 2nd Flr, AL - EZZ Tower (SBUT), Ibrahim Rehmatullah Road, Bhendi Bazaar, Mumbai - 400003.
                 </p>

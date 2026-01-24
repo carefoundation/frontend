@@ -23,9 +23,9 @@ export default function CertificatesPage() {
         const formatted = data.map((cert: any) => ({
           id: cert._id || cert.id,
           title: cert.type || cert.title || 'Certificate',
-          description: cert.description || 'Certificate issued by Care Foundation Trust',
+          description: cert.description || 'Certificate issued by Care Foundation Trust®',
           image: cert.image || 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800',
-          issuedBy: cert.issuedBy || 'Care Foundation Trust',
+          issuedBy: cert.issuedBy || 'Care Foundation Trust®',
           validity: cert.validity || cert.expiryDate ? `Valid until ${new Date(cert.expiryDate).getFullYear()}` : 'Permanent',
           certificateNumber: cert.certificateNumber || cert._id,
         }));
@@ -36,7 +36,7 @@ export default function CertificatesPage() {
           {
             id: 1,
             title: '80G Tax Exemption Certificate',
-            description: 'Donations to Care Foundation Trust are eligible for tax deduction under Section 80G of the Income Tax Act, 1961.',
+            description: 'Donations to Care Foundation Trust® are eligible for tax deduction under Section 80G of the Income Tax Act, 1961.',
             image: 'https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800',
             issuedBy: 'Income Tax Department, Government of India',
             validity: 'Valid until 2026',

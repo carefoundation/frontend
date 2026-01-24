@@ -3,11 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Heart, TrendingUp, Users, Target, Plus, Eye, Edit, Trash2, ArrowRight, Wallet, Award, Download, Ticket, Loader2 } from 'lucide-react';
+import dynamic from 'next/dynamic';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import ProgressBar from '@/components/ui/ProgressBar';
-import PartnerKycModal from '@/components/PartnerKycModal';
 import { api, ApiError } from '@/lib/api';
+
+const PartnerKycModal = dynamic(() => import('@/components/PartnerKycModal'), { ssr: false });
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState<'overview' | 'donations' | 'campaigns'>('overview');
