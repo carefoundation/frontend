@@ -381,9 +381,9 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className=" bg-white">
       {/* Video/Image Slider Section - Directly below navbar */}
-      <div className="relative w-full h-[500px]">
+      <div className="relative w-full ">
         <VideoImageSlider
           items={sliderItems}
           imageSlideDuration={5}
@@ -391,7 +391,7 @@ export default function Home() {
       </div>
       
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#ecfdf5] via-white to-[#ecfdf5] py-20 lg:py-32">
+      <section className="relative bg-gradient-to-br from-[#ecfdf5] via-white to-[#ecfdf5] py-8 md:py-20 lg:py-32">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="animate-slide-in">
@@ -769,7 +769,7 @@ export default function Home() {
                               }}
                             >
                               <Ticket className="h-3 w-3 mr-1" />
-                              Get Coupon
+                              Consult Now
                             </Button>
                             <button
                               className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
@@ -1049,7 +1049,7 @@ export default function Home() {
                                 }}
                               >
                                 <Ticket className="h-3 w-3 mr-1" />
-                                Get Coupon
+                                Consult Now
                               </Button>
                               <button
                                 className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
@@ -1189,7 +1189,7 @@ export default function Home() {
                                 }}
                               >
                                 <Ticket className="h-3 w-3 mr-1" />
-                                Get Coupon
+                                Consult Now
                               </Button>
                               <button
                                 className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"

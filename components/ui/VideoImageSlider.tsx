@@ -251,13 +251,13 @@ export default function VideoImageSlider({
   };
 
   return (
-    <div ref={containerRef} className="relative w-full h-[350px] md:h-[400px] lg:h-[450px] overflow-hidden">
+    <div ref={containerRef} className="relative w-full h-full overflow-hidden">
       {currentItem.type === 'video' ? (
         <div className="relative w-full h-full">
           <video
             ref={videoRef}
             src={currentItem.src}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             onEnded={handleVideoEnd}
             onLoadedData={() => {
               // Try to play when video is loaded

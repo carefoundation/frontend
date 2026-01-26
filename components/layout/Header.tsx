@@ -128,9 +128,16 @@ export default function Header() {
     setOpenDropdown(null);
   };
 
-  const handleMobileLinkClick = (href: string) => {
-    closeMenu();
+  const handleMobileLinkClick = (href: string, e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    setOpenDropdown(null);
     router.push(href);
+    setTimeout(() => {
+      setIsMenuOpen(false);
+    }, 100);
   };
 
   const toggleDropdown = (dropdown: string) => {
@@ -424,8 +431,8 @@ export default function Header() {
 
         {/* Mobile Menu */}
         <div
-          className={`lg:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0'
+          className={`lg:hidden transition-all duration-300 ease-in-out ${
+            isMenuOpen ? 'max-h-[80vh] opacity-100 overflow-y-auto' : 'max-h-0 opacity-0 overflow-hidden'
           }`}
         >
           <div className="py-4 space-y-2 border-t border-gray-200">
@@ -436,149 +443,109 @@ export default function Header() {
               Home
             </button>
 
-            {/* Mobile Crowd Funding Dropdown */}
+            {/* Mobile Crowd Funding */}
             <div>
-              <button
-                onClick={() => toggleDropdown('about-mobile')}
-                className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-[#ecfdf5] hover:text-[#10b981] rounded-lg transition-colors font-medium"
-                suppressHydrationWarning
-              >
-                <span>Crowd Funding</span>
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 ${
-                    openDropdown === 'about-mobile' ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-              {openDropdown === 'about-mobile' && (
-                <div className="pl-4 mt-1 space-y-1">
-                  {aboutDropdownItems.map((item) => (
-                    <button
-                      key={item.href}
-                      onClick={() => handleMobileLinkClick(item.href)}
-                      className="w-full flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-[#ecfdf5] hover:text-[#10b981] rounded-lg transition-colors text-sm text-left"
-                    >
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
+              <div className="px-4 py-3 text-gray-700 font-medium">
+                Crowd Funding
+              </div>
+              <div className="pl-4 mt-1 space-y-1">
+                {aboutDropdownItems.map((item) => (
+                  <button
+                    key={item.href}
+                    onClick={(e) => handleMobileLinkClick(item.href, e)}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-[#ecfdf5] hover:text-[#10b981] rounded-lg transition-colors text-sm text-left"
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Mobile Partners Dropdown */}
+            {/* Mobile Partners */}
             <div>
-              <button
-                onClick={() => toggleDropdown('campaigns-mobile')}
-                className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-[#ecfdf5] hover:text-[#10b981] rounded-lg transition-colors font-medium"
-                suppressHydrationWarning
-              >
-                <span>Partners</span>
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 ${
-                    openDropdown === 'campaigns-mobile' ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-              {openDropdown === 'campaigns-mobile' && (
-                <div className="pl-4 mt-1 space-y-1">
-                  {campaignsDropdownItems.map((item) => (
-                    <button
-                      key={item.href}
-                      onClick={() => handleMobileLinkClick(item.href)}
-                      className="w-full flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-[#ecfdf5] hover:text-[#10b981] rounded-lg transition-colors text-sm text-left"
-                    >
-                      <item.icon className="h-4 w-4" />
-                      <span>{item.label}</span>
-                    </button>
-                  ))}
-                </div>
-              )}
+              <div className="px-4 py-3 text-gray-700 font-medium">
+                Partners
+              </div>
+              <div className="pl-4 mt-1 space-y-1">
+                {campaignsDropdownItems.map((item) => (
+                  <button
+                    key={item.href}
+                    onClick={(e) => handleMobileLinkClick(item.href, e)}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-[#ecfdf5] hover:text-[#10b981] rounded-lg transition-colors text-sm text-left"
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            {/* Mobile Join Us Dropdown */}
+            {/* Mobile Join Us */}
             <div>
-              <button
-                onClick={() => toggleDropdown('joinUs-mobile')}
-                className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-[#ecfdf5] hover:text-[#10b981] rounded-lg transition-colors font-medium"
-                suppressHydrationWarning
-              >
-                <span>Join Us</span>
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 ${
-                    openDropdown === 'joinUs-mobile' ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-              {openDropdown === 'joinUs-mobile' && (
-                <div className="pl-4 mt-1 space-y-1">
-                  {joinUsDropdownItems.map((item) => {
-                    if (item.href === '/volunteer') {
-                      return (
-                        <button
-                          key={item.href}
-                          onClick={() => {
-                            closeMenu();
-                            if (!isLoggedIn) {
-                              if (typeof window !== 'undefined') {
-                                localStorage.setItem('redirectAfterLogin', '/volunteer');
-                              }
-                              showToast('Please login to become a volunteer', 'info');
-                              router.push('/login');
-                            } else {
-                              router.push('/volunteer');
-                            }
-                          }}
-                          className="w-full flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-[#ecfdf5] hover:text-[#10b981] rounded-lg transition-colors text-sm text-left"
-                        >
-                          <item.icon className="h-4 w-4" />
-                          <span>{item.label}</span>
-                        </button>
-                      );
-                    }
+              <div className="px-4 py-3 text-gray-700 font-medium">
+                Join Us
+              </div>
+              <div className="pl-4 mt-1 space-y-1">
+                {joinUsDropdownItems.map((item) => {
+                  if (item.href === '/volunteer') {
                     return (
                       <button
                         key={item.href}
-                        onClick={() => handleMobileLinkClick(item.href)}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          if (!isLoggedIn) {
+                            if (typeof window !== 'undefined') {
+                              localStorage.setItem('redirectAfterLogin', '/volunteer');
+                            }
+                            showToast('Please login to become a volunteer', 'info');
+                            router.push('/login');
+                          } else {
+                            router.push('/volunteer');
+                          }
+                          setTimeout(() => {
+                            setIsMenuOpen(false);
+                          }, 100);
+                        }}
                         className="w-full flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-[#ecfdf5] hover:text-[#10b981] rounded-lg transition-colors text-sm text-left"
                       >
                         <item.icon className="h-4 w-4" />
                         <span>{item.label}</span>
                       </button>
                     );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Mobile More Dropdown */}
-            <div>
-              <button
-                onClick={() => toggleDropdown('more-mobile')}
-                className="w-full flex items-center justify-between px-4 py-3 text-gray-700 hover:bg-[#ecfdf5] hover:text-[#10b981] rounded-lg transition-colors font-medium"
-                suppressHydrationWarning
-              >
-                <span>More</span>
-                <ChevronDown
-                  className={`h-4 w-4 transition-transform duration-200 ${
-                    openDropdown === 'more-mobile' ? 'rotate-180' : ''
-                  }`}
-                />
-              </button>
-              {openDropdown === 'more-mobile' && (
-                <div className="pl-4 mt-1 space-y-1">
-                  {moreDropdownItems.map((item) => (
+                  }
+                  return (
                     <button
                       key={item.href}
-                      onClick={() => handleMobileLinkClick(item.href)}
+                      onClick={(e) => handleMobileLinkClick(item.href, e)}
                       className="w-full flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-[#ecfdf5] hover:text-[#10b981] rounded-lg transition-colors text-sm text-left"
                     >
                       <item.icon className="h-4 w-4" />
                       <span>{item.label}</span>
                     </button>
-                  ))}
-                </div>
-              )}
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Mobile More */}
+            <div>
+              <div className="px-4 py-3 text-gray-700 font-medium">
+                More
+              </div>
+              <div className="pl-4 mt-1 space-y-1">
+                {moreDropdownItems.map((item) => (
+                  <button
+                    key={item.href}
+                    onClick={(e) => handleMobileLinkClick(item.href, e)}
+                    className="w-full flex items-center gap-3 px-4 py-2 text-gray-600 hover:bg-[#ecfdf5] hover:text-[#10b981] rounded-lg transition-colors text-sm text-left"
+                  >
+                    <item.icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Other Mobile Links */}
