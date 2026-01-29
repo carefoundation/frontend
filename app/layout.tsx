@@ -20,7 +20,7 @@ const robotoMono = Roboto_Mono({
 });
 
 export const metadata: Metadata = generateSEOMetadata({
-  title: "Vishal Rajput - Crowdfunding & Donation Platform",
+  title: "Care - Crowdfunding & Donation Platform",
   description:
     "Together We Can Save Lives - Support causes, start fundraisers, and make a difference",
   keywords: ["donation", "crowdfunding", "charity", "fundraiser", "non-profit"],
