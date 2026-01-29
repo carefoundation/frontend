@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ArrowLeft, MapPin, Phone, Mail, Clock, Map, FlaskConical, Heart, Loader2, Ticket, X, QrCode, Copy, CheckCircle } from 'lucide-react';
+import { ArrowLeft, MapPin, Phone, Mail, Clock, Map, FlaskConical, Heart, Loader2, Ticket, X, QrCode, Copy, CheckCircle, Calendar, User, DollarSign, ExternalLink, Share2 } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -135,7 +135,7 @@ export default function PathologyPartnerDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16">
+    <div className="min-h-screen bg-gray-50 pt-16 pb-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <button
@@ -147,11 +147,11 @@ export default function PathologyPartnerDetailPage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-[5px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
           <div className="lg:col-span-7">
             <div className="relative h-64 sm:h-80 lg:h-96 w-full overflow-hidden bg-gray-200">
               <Image
-                src={partner.photo || partner.logo || 'https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=800&h=600&fit=crop'}
+                src={partner.formData?.banner || partner.formData?.labImages?.[0] || partner.photo || partner.logo || 'https://images.unsplash.com/photo-1582719471384-894fbb16e074?w=800&h=600&fit=crop'}
                 alt={partner.name || partner.businessName || 'Partner'}
                 fill
                 className="object-cover"
@@ -171,25 +171,290 @@ export default function PathologyPartnerDetailPage() {
               </div>
             </div>
 
-            <Card className="rounded-none border-0 shadow-none p-6 sm:p-8 lg:p-10 bg-white">
-              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{partner.name || partner.businessName}</h1>
-              <p className="text-gray-600 text-lg sm:text-xl mb-8 leading-relaxed">{partner.description || partner.about}</p>
+            <Card className="rounded-none border-0 shadow-none p-6 sm:p-8 lg:p-10 pb-8 sm:pb-10 lg:pb-12 bg-white">
+              <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{partner.name || partner.businessName || partner.formData?.labName}</h1>
+              <p className="text-gray-600 text-lg sm:text-xl mb-8 leading-relaxed">{partner.description || partner.about || partner.formData?.description}</p>
 
-              <div className="mb-8">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Tests Available</h2>
-                <div className="flex flex-wrap gap-3 sm:gap-4">
-                  {(partner.programs || []).map((program: string, index: number) => (
-                    <span
-                      key={index}
-                      className="px-4 sm:px-5 py-2 sm:py-3 bg-gradient-to-r from-[#ecfdf5] to-[#d1fae5] text-[#10b981] text-sm sm:text-base font-bold rounded-xl border-2 border-[#10b981]/30 shadow-sm hover:shadow-md transition-all"
-                    >
-                      {program}
-                    </span>
-                  ))}
+              {/* Pathology Lab Details Section */}
+              {partner.formData && (
+                <div className="mb-8 pb-6 space-y-6">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b-2 border-gray-200 pb-3 flex items-center gap-2">
+                    <FlaskConical className="h-6 w-6 text-[#10b981]" />
+                    Lab Information
+                  </h2>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Email */}
+                    {(partner.formData.email || partner.email) && (
+                      <div className="flex items-start gap-3">
+                        <Mail className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Email</div>
+                          <a href={`mailto:${partner.formData.email || partner.email}`} className="text-base font-medium text-gray-900 hover:text-[#10b981] break-all">
+                            {partner.formData.email || partner.email}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Phone */}
+                    {(partner.formData.phone || partner.phone || partner.mobileNumber) && (
+                      <div className="flex items-start gap-3">
+                        <Phone className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Phone</div>
+                          <a href={`tel:${partner.formData.phone || partner.phone || partner.mobileNumber}`} className="text-base font-medium text-gray-900 hover:text-[#10b981]">
+                            {partner.formData.phone || partner.phone || partner.mobileNumber}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Test Types */}
+                    {(partner.formData.testTypes || partner.programs) && (
+                      <div className="flex items-start gap-3 md:col-span-2">
+                        <FlaskConical className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div className="flex-1">
+                          <div className="text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wide">Test Types</div>
+                          <div className="flex flex-wrap gap-3 sm:gap-4">
+                            {partner.formData.testTypes ? (
+                              typeof partner.formData.testTypes === 'string' ? (
+                                partner.formData.testTypes.split(',').map((test: string, index: number) => (
+                                  <span
+                                    key={index}
+                                    className="px-4 sm:px-5 py-2 sm:py-3 bg-gradient-to-r from-[#ecfdf5] to-[#d1fae5] text-[#10b981] text-sm sm:text-base font-bold rounded-xl border-2 border-[#10b981]/30 shadow-sm hover:shadow-md transition-all"
+                                  >
+                                    {test.trim()}
+                                  </span>
+                                ))
+                              ) : (
+                                partner.formData.testTypes.map((test: string, index: number) => (
+                                  <span
+                                    key={index}
+                                    className="px-4 sm:px-5 py-2 sm:py-3 bg-gradient-to-r from-[#ecfdf5] to-[#d1fae5] text-[#10b981] text-sm sm:text-base font-bold rounded-xl border-2 border-[#10b981]/30 shadow-sm hover:shadow-md transition-all"
+                                  >
+                                    {test}
+                                  </span>
+                                ))
+                              )
+                            ) : (
+                              (partner.programs || []).map((program: string, index: number) => (
+                                <span
+                                  key={index}
+                                  className="px-4 sm:px-5 py-2 sm:py-3 bg-gradient-to-r from-[#ecfdf5] to-[#d1fae5] text-[#10b981] text-sm sm:text-base font-bold rounded-xl border-2 border-[#10b981]/30 shadow-sm hover:shadow-md transition-all"
+                                >
+                                  {program}
+                                </span>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Fees For Care Foundation Trust */}
+                    {partner.formData.feesForCareFoundation && (
+                      <div className="flex items-start gap-3">
+                        <DollarSign className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Fees For Care Foundation Trust®</div>
+                          <div className="text-base font-medium text-gray-900">{partner.formData.feesForCareFoundation}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Offer For NGO */}
+                    {partner.formData.offerForNGO && (
+                      <div className="flex items-start gap-3">
+                        <Heart className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Offer For NGO</div>
+                          <div className="text-base font-medium text-gray-900">{partner.formData.offerForNGO}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Google Business Link */}
+                    {partner.formData.googleBusinessLink && (
+                      <div className="flex items-start gap-3 md:col-span-2">
+                        <ExternalLink className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Google Business Link</div>
+                          <a 
+                            href={partner.formData.googleBusinessLink} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-base font-medium text-[#10b981] hover:underline break-all"
+                          >
+                            {partner.formData.googleBusinessLink}
+                          </a>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Address Details */}
+                  {(partner.formData.streetAddress || partner.formData.city || partner.formData.state || partner.formData.pincode) && (
+                    <div className="pt-6 border-t-2 border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <MapPin className="h-5 w-5 text-[#10b981]" />
+                        Address
+                      </h3>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {partner.formData.streetAddress && (
+                          <div className="md:col-span-2">
+                            <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Street Address</div>
+                            <div className="text-base font-medium text-gray-900">{partner.formData.streetAddress}</div>
+                          </div>
+                        )}
+                        {partner.formData.city && (
+                          <div>
+                            <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">City</div>
+                            <div className="text-base font-medium text-gray-900">{partner.formData.city}</div>
+                          </div>
+                        )}
+                        {partner.formData.state && (
+                          <div>
+                            <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">State</div>
+                            <div className="text-base font-medium text-gray-900">{partner.formData.state}</div>
+                          </div>
+                        )}
+                        {partner.formData.pincode && (
+                          <div>
+                            <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Pincode</div>
+                            <div className="text-base font-medium text-gray-900">{partner.formData.pincode}</div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Operating Hours */}
+                  {(partner.formData?.operatingHours || partner.formData?.timing || partner.formData?.simpleTiming || typeof partner.formData?.operatingHours === 'string') && (
+                    <div className="pt-6 border-t-2 border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-[#10b981]" />
+                        Operating Hours
+                      </h3>
+                      {partner.formData?.simpleTiming ? (
+                        <div className="bg-[#ecfdf5] p-4 rounded-lg">
+                          <div className="text-base font-medium text-gray-900">{partner.formData.simpleTiming}</div>
+                        </div>
+                      ) : typeof partner.formData?.operatingHours === 'string' && partner.formData.operatingHours ? (
+                        <div className="bg-[#ecfdf5] p-4 rounded-lg">
+                          <div className="text-base font-medium text-gray-900">{partner.formData.operatingHours}</div>
+                        </div>
+                      ) : (
+                        <div className="space-y-4">
+                          {/* Morning Time */}
+                          {(() => {
+                            const timing = partner.formData?.operatingHours || partner.formData?.timing;
+                            const morning = timing?.morning;
+                            if (morning && (morning.from || morning.to || (morning.days && morning.days.length > 0))) {
+                              return (
+                                <div className="bg-[#ecfdf5] p-4 rounded-lg">
+                                  <div className="font-semibold text-gray-900 mb-2">Morning Time</div>
+                                  <div className="text-sm text-gray-700">
+                                    {morning.from && morning.to ? (
+                                      <>
+                                        <span className="font-medium">{morning.from}</span>
+                                        {' → '}
+                                        <span className="font-medium">{morning.to}</span>
+                                      </>
+                                    ) : (
+                                      <span className="text-gray-500">Not specified</span>
+                                    )}
+                                  </div>
+                                  {morning.days && morning.days.length > 0 && (
+                                    <div className="mt-2 flex flex-wrap gap-2">
+                                      {morning.days.map((day: string, index: number) => (
+                                        <span key={index} className="px-2 py-1 bg-white text-[#10b981] text-xs font-medium rounded">
+                                          {day.substring(0, 3)}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            }
+                            return null;
+                          })()}
+
+                          {/* Evening Time */}
+                          {(() => {
+                            const timing = partner.formData?.operatingHours || partner.formData?.timing;
+                            const evening = timing?.evening;
+                            if (evening && (evening.from || evening.to || (evening.days && evening.days.length > 0))) {
+                              return (
+                                <div className="bg-[#ecfdf5] p-4 rounded-lg">
+                                  <div className="font-semibold text-gray-900 mb-2">Evening Time</div>
+                                  <div className="text-sm text-gray-700">
+                                    {evening.from && evening.to ? (
+                                      <>
+                                        <span className="font-medium">{evening.from}</span>
+                                        {' → '}
+                                        <span className="font-medium">{evening.to}</span>
+                                      </>
+                                    ) : (
+                                      <span className="text-gray-500">Not specified</span>
+                                    )}
+                                  </div>
+                                  {evening.days && evening.days.length > 0 && (
+                                    <div className="mt-2 flex flex-wrap gap-2">
+                                      {evening.days.map((day: string, index: number) => (
+                                        <span key={index} className="px-2 py-1 bg-white text-[#10b981] text-xs font-medium rounded">
+                                          {day.substring(0, 3)}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            }
+                            return null;
+                          })()}
+
+                          {/* Night Time */}
+                          {(() => {
+                            const timing = partner.formData?.operatingHours || partner.formData?.timing;
+                            const night = timing?.night;
+                            if (night && (night.from || night.to || (night.days && night.days.length > 0))) {
+                              return (
+                                <div className="bg-[#ecfdf5] p-4 rounded-lg">
+                                  <div className="font-semibold text-gray-900 mb-2">Night Time</div>
+                                  <div className="text-sm text-gray-700">
+                                    {night.from && night.to ? (
+                                      <>
+                                        <span className="font-medium">{night.from}</span>
+                                        {' → '}
+                                        <span className="font-medium">{night.to}</span>
+                                      </>
+                                    ) : (
+                                      <span className="text-gray-500">Not specified</span>
+                                    )}
+                                  </div>
+                                  {night.days && night.days.length > 0 && (
+                                    <div className="mt-2 flex flex-wrap gap-2">
+                                      {night.days.map((day: string, index: number) => (
+                                        <span key={index} className="px-2 py-1 bg-white text-[#10b981] text-xs font-medium rounded">
+                                          {day.substring(0, 3)}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            }
+                            return null;
+                          })()}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
-              </div>
+              )}
 
-              <div className="pt-6 sm:pt-8 border-t-2 border-gray-200">
+              <div className="pt-6 sm:pt-8 pb-4 sm:pb-6 border-t-2 border-gray-200">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6">
                   {partner.impact && (
                     <div className="bg-gray-50 px-4 py-3 rounded-lg">
@@ -209,7 +474,7 @@ export default function PathologyPartnerDetailPage() {
           </div>
 
           <div className="lg:col-span-5">
-            <Card className="rounded-none shadow-none p-5 sm:p-6 lg:p-8 lg:sticky lg:top-20 h-full lg:min-h-screen bg-gray-50">
+            <Card className="rounded-none shadow-none p-5 sm:p-6 lg:p-8 lg:sticky lg:top-20 bg-gray-50">
               <div className="mb-6 sm:mb-8">
                 <div className="flex items-center gap-3 mb-5 sm:mb-6 pb-4 sm:pb-5 border-b-2 border-gray-300">
                   <div className="bg-[#10b981] p-2 rounded-lg">
@@ -246,16 +511,22 @@ export default function PathologyPartnerDetailPage() {
                     <div className="text-xs font-semibold text-gray-500 mb-1.5 sm:mb-2 uppercase tracking-wide">Address</div>
                     <div className="flex items-start gap-2 sm:gap-2.5 text-sm text-gray-700">
                       <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#10b981] flex-shrink-0 mt-0.5" />
-                      <span className="font-medium">{partner.address || `${partner.city || ''} ${partner.state || ''}`.trim() || 'N/A'}</span>
+                      <span className="font-medium">
+                        {partner.formData?.streetAddress || partner.address || 
+                         `${partner.formData?.city || partner.city || ''} ${partner.formData?.state || partner.state || ''}`.trim() || 'N/A'}
+                        {partner.formData?.pincode && ` - ${partner.formData.pincode}`}
+                      </span>
                     </div>
                   </div>
 
-                  {(partner.operatingHours || partner.hours) && (
+                  {(partner.formData?.simpleTiming || partner.formData?.operatingHours || partner.formData?.timing || partner.operatingHours || partner.hours) && (
                     <div className="pb-2 sm:pb-3 border-b border-gray-100">
                       <div className="text-xs font-semibold text-gray-500 mb-1.5 sm:mb-2 uppercase tracking-wide">Operating Hours</div>
                       <div className="flex items-center gap-2 sm:gap-2.5 text-sm text-gray-700">
                         <Clock className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#10b981] flex-shrink-0" />
-                        <span className="font-medium">{partner.operatingHours || partner.hours}</span>
+                        <span className="font-medium">
+                          {partner.formData?.simpleTiming || partner.operatingHours || partner.hours || 'Check details below'}
+                        </span>
                       </div>
                     </div>
                   )}
@@ -343,28 +614,35 @@ export default function PathologyPartnerDetailPage() {
                     variant="outline" 
                     size="sm" 
                     className="w-full border-gray-200 hover:border-[#10b981] hover:text-[#10b981] transition-all text-xs sm:text-sm font-medium"
-                    onClick={handleGetCoupon}
-                    disabled={generatingCoupon}
+                    onClick={() => {
+                      if (partner.formData?.googleBusinessLink) {
+                        window.open(partner.formData.googleBusinessLink, '_blank');
+                      } else {
+                        showToast('Google Business Link not available', 'error');
+                      }
+                    }}
+                    disabled={!partner.formData?.googleBusinessLink}
                   >
-                    <Ticket className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
-                    {generatingCoupon ? 'Generating...' : 'Get Coupon'}
+                    <Map className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 sm:mr-1.5" />
+                    View Map
                   </Button>
                   <button
-                    className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold text-xs sm:text-sm py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 shadow-md hover:shadow-lg"
+                    className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs sm:text-sm py-2 sm:py-2.5 px-3 sm:px-4 rounded-lg flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-200 shadow-md hover:shadow-lg"
                     onClick={() => {
-                      let phoneNumber = (partner.phone || partner.mobileNumber || partner.contact || '').replace(/[\s\-+()]/g, '');
-                      if (phoneNumber && !phoneNumber.startsWith('91') && phoneNumber.length === 10) {
-                        phoneNumber = '91' + phoneNumber;
-                      }
-                      if (phoneNumber) {
-                        window.open(`https://wa.me/${phoneNumber}`, '_blank');
+                      if (navigator.share) {
+                        navigator.share({
+                          title: partner.name || partner.businessName || 'Partner',
+                          text: `Check out ${partner.name || partner.businessName || 'this partner'}`,
+                          url: window.location.href,
+                        }).catch(() => {});
+                      } else {
+                        navigator.clipboard.writeText(window.location.href);
+                        showToast('Link copied to clipboard!', 'success');
                       }
                     }}
                   >
-                    <svg className="h-4 w-4 sm:h-5 sm:w-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.239-.375a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                    </svg>
-                    <span className="hidden sm:inline">Contact on </span>WhatsApp
+                    <Share2 className="h-4 w-4 sm:h-5 sm:w-5" />
+                    Share
                   </button>
                 </div>
               </div>

@@ -64,6 +64,13 @@ export default function VolunteerPage() {
     setError(null);
     setSuccess(false);
     
+    // Validate phone number - must be exactly 10 digits
+    if (!formData.phone || !/^\d{10}$/.test(formData.phone)) {
+      setError('Please enter a valid 10-digit phone number');
+      setIsSubmitting(false);
+      return;
+    }
+    
     try {
       await api.post('/volunteers', formData);
       setSuccess(true);
@@ -90,10 +97,22 @@ export default function VolunteerPage() {
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    // For phone number field, only allow digits and limit to 10
+    if (name === 'phone') {
+      const numericValue = value.replace(/\D/g, ''); // Remove non-digits
+      if (numericValue.length <= 10) {
+        setFormData({
+          ...formData,
+          [name]: numericValue,
+        });
+      }
+    } else {
+      setFormData({
+        ...formData,
+        [name]: value,
+      });
+    }
   };
 
   const volunteerOpportunities = [
@@ -242,8 +261,9 @@ export default function VolunteerPage() {
                     value={formData.phone}
                     onChange={handleChange}
                     required
+                    maxLength={10}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
-                    placeholder="+91 9876543210"
+                    placeholder="9876543210"
                     suppressHydrationWarning
                   />
                 </div>

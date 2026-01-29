@@ -341,16 +341,20 @@ export default function CreatePathologyPage() {
 
                 <div>
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
-                    Description
+                    Description <span className="text-gray-500 text-xs">(Max 120 characters)</span>
                   </label>
                   <textarea
                     name="description"
                     value={formData.description}
                     onChange={handleInputChange}
                     rows={3}
+                    maxLength={120}
                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent bg-white resize-y"
                     placeholder="Lab description and services"
                   />
+                  <p className="text-xs text-gray-500 mt-1">
+                    {formData.description.length}/120 characters
+                  </p>
                 </div>
               </div>
             </div>

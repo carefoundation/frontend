@@ -81,7 +81,7 @@ const partnerSection = [
 ];
 
 const usersSection = [
-  { href: '/admin/users', label: 'Registered Users', icon: Users },
+  { href: '/admin/users', label: 'Registered', icon: Users },
 ];
 
 

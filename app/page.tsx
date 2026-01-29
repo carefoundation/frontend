@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { Heart, TrendingUp, Users, Target, ArrowRight, CheckCircle, Star, User, Mail, Phone, Map, ChevronLeft, ChevronRight, Ticket, X, QrCode, Copy } from 'lucide-react';
+import { Heart, TrendingUp, Users, Target, ArrowRight, CheckCircle, Star, User, Mail, Phone, Map, ChevronLeft, ChevronRight, Ticket, X, QrCode, Copy, Share2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -48,6 +48,13 @@ export default function Home() {
     }
     if (!donorName || !donorEmail || !donorPhone) {
       showToast('Please fill all required fields', 'error');
+      return;
+    }
+    
+    // Validate phone number - must be exactly 10 digits
+    const phoneDigits = donorPhone.replace(/\D/g, '');
+    if (!/^\d{10}$/.test(phoneDigits)) {
+      showToast('Please enter a valid 10-digit phone number', 'error');
       return;
     }
     
@@ -376,14 +383,14 @@ export default function Home() {
   const sliderItems = [
     {
       type: 'video' as const,
-      src: encodeURI('/When I_m Hungry _ Feed the Children(720P_HD).mp4'),
+      src: '/carevideo.mp4',
     },
   ];
 
   return (
-    <div className=" bg-white">
+    <div className="bg-white">
       {/* Video/Image Slider Section - Directly below navbar */}
-      <div className="relative w-full ">
+      <div className="relative w-full h-[calc(100vh-6rem)] sm:h-[calc(100vh-7.5rem)] overflow-hidden mt-24 sm:mt-[7.5rem]">
         <VideoImageSlider
           items={sliderItems}
           imageSlideDuration={5}
@@ -512,8 +519,14 @@ export default function Home() {
                       <input
                         type="tel"
                         value={donorPhone}
-                        onChange={(e) => setDonorPhone(e.target.value)}
-                        placeholder="+91 9876543210"
+                        onChange={(e) => {
+                          const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                          if (value.length <= 10) {
+                            setDonorPhone(value);
+                          }
+                        }}
+                        placeholder="9876543210"
+                        maxLength={10}
                         className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
                         required
                         suppressHydrationWarning
@@ -651,16 +664,18 @@ export default function Home() {
       </section>
       
       {/* Partners */}
-      <section className="py-16 bg-gray-50">
-        <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Partners</h2>
-            <p className="text-lg text-gray-600">Trusted by leading health and food organizations</p>
-          </div>
+      {(healthPartners.length > 0 || foodPartners.length > 0 || hospitalPartners.length > 0 || medicinePartners.length > 0 || pathologyPartners.length > 0) && (
+        <section className="py-16 bg-gray-50">
+          <div className="w-full px-4 sm:px-6 lg:px-8">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Partners</h2>
+              <p className="text-lg text-gray-600">Trusted by leading health and food organizations</p>
+            </div>
           
           {/* Health Partners */}
-          <div className="mb-16">
-            <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">Health Partners</h3>
+          {healthPartners.length > 0 && (
+            <div className="mb-16">
+              <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">Doctor's  for u</h3>
             <div className="relative">
               {healthPartners.length > 1 && (
                 <>
@@ -772,22 +787,23 @@ export default function Home() {
                               Consult Now
                             </Button>
                             <button
-                              className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
+                              className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                let phoneNumber = (partner.phone || '').replace(/[\s\-+()]/g, '');
-                                if (phoneNumber && !phoneNumber.startsWith('91') && phoneNumber.length === 10) {
-                                  phoneNumber = '91' + phoneNumber;
-                                }
-                                if (phoneNumber) {
-                                  window.open(`https://wa.me/${phoneNumber}`, '_blank');
+                                if (navigator.share) {
+                                  navigator.share({
+                                    title: partner.name || 'Partner',
+                                    text: `Check out ${partner.name || 'this partner'}`,
+                                    url: `${window.location.origin}/partners/food/${partner._id || partner.id}`,
+                                  }).catch(() => {});
+                                } else {
+                                  navigator.clipboard.writeText(`${window.location.origin}/partners/food/${partner._id || partner.id}`);
+                                  showToast('Link copied to clipboard!', 'success');
                                 }
                               }}
                             >
-                              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.239-.375a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                              </svg>
-                              WhatsApp
+                              <Share2 className="h-3 w-3" />
+                              Share
                             </button>
                           </div>
                         </div>
@@ -798,10 +814,12 @@ export default function Home() {
               </div>
             </div>
           </div>
+          )}
 
           {/* Food Partners */}
-          <div>
-            <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">Food Partners</h3>
+          {foodPartners.length > 0 && (
+            <div className="mb-16">
+              <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">Food Partners</h3>
             <div className="relative">
               {foodPartners.length > 1 && (
                 <>
@@ -913,22 +931,23 @@ export default function Home() {
                               Get Coupon
                             </Button>
                             <button
-                              className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
+                              className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                let phoneNumber = (partner.phone || '').replace(/[\s\-+()]/g, '');
-                                if (phoneNumber && !phoneNumber.startsWith('91') && phoneNumber.length === 10) {
-                                  phoneNumber = '91' + phoneNumber;
-                                }
-                                if (phoneNumber) {
-                                  window.open(`https://wa.me/${phoneNumber}`, '_blank');
+                                if (navigator.share) {
+                                  navigator.share({
+                                    title: partner.name || 'Partner',
+                                    text: `Check out ${partner.name || 'this partner'}`,
+                                    url: `${window.location.origin}/partners/health/${partner._id || partner.id}`,
+                                  }).catch(() => {});
+                                } else {
+                                  navigator.clipboard.writeText(`${window.location.origin}/partners/health/${partner._id || partner.id}`);
+                                  showToast('Link copied to clipboard!', 'success');
                                 }
                               }}
                             >
-                              <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.239-.375a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                              </svg>
-                              WhatsApp
+                              <Share2 className="h-3 w-3" />
+                              Share
                             </button>
                           </div>
                         </div>
@@ -939,6 +958,7 @@ export default function Home() {
               </div>
             </div>
           </div>
+          )}
 
           {/* Hospital Partners */}
           {hospitalPartners.length > 0 && (
@@ -1052,22 +1072,23 @@ export default function Home() {
                                 Consult Now
                               </Button>
                               <button
-                                className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
+                                className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  let phoneNumber = (partner.phone || '').replace(/[\s\-+()]/g, '');
-                                  if (phoneNumber && !phoneNumber.startsWith('91') && phoneNumber.length === 10) {
-                                    phoneNumber = '91' + phoneNumber;
-                                  }
-                                  if (phoneNumber) {
-                                    window.open(`https://wa.me/${phoneNumber}`, '_blank');
+                                  if (navigator.share) {
+                                    navigator.share({
+                                      title: partner.name || 'Partner',
+                                      text: `Check out ${partner.name || 'this partner'}`,
+                                      url: `${window.location.origin}/partners/medicine/${partner._id || partner.id}`,
+                                    }).catch(() => {});
+                                  } else {
+                                    navigator.clipboard.writeText(`${window.location.origin}/partners/medicine/${partner._id || partner.id}`);
+                                    showToast('Link copied to clipboard!', 'success');
                                   }
                                 }}
                               >
-                                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.239-.375a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                                </svg>
-                                WhatsApp
+                                <Share2 className="h-3 w-3" />
+                                Share
                               </button>
                             </div>
                           </div>
@@ -1192,22 +1213,23 @@ export default function Home() {
                                 Consult Now
                               </Button>
                               <button
-                                className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
+                                className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  let phoneNumber = (partner.phone || '').replace(/[\s\-+()]/g, '');
-                                  if (phoneNumber && !phoneNumber.startsWith('91') && phoneNumber.length === 10) {
-                                    phoneNumber = '91' + phoneNumber;
-                                  }
-                                  if (phoneNumber) {
-                                    window.open(`https://wa.me/${phoneNumber}`, '_blank');
+                                  if (navigator.share) {
+                                    navigator.share({
+                                      title: partner.name || 'Partner',
+                                      text: `Check out ${partner.name || 'this partner'}`,
+                                      url: `${window.location.origin}/partners/medicine/${partner._id || partner.id}`,
+                                    }).catch(() => {});
+                                  } else {
+                                    navigator.clipboard.writeText(`${window.location.origin}/partners/medicine/${partner._id || partner.id}`);
+                                    showToast('Link copied to clipboard!', 'success');
                                   }
                                 }}
                               >
-                                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.239-.375a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                                </svg>
-                                WhatsApp
+                                <Share2 className="h-3 w-3" />
+                                Share
                               </button>
                             </div>
                           </div>
@@ -1332,22 +1354,23 @@ export default function Home() {
                                 Get Coupon
                               </Button>
                               <button
-                                className="w-full bg-[#25D366] hover:bg-[#20BA5A] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
+                                className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  let phoneNumber = (partner.phone || '').replace(/[\s\-+()]/g, '');
-                                  if (phoneNumber && !phoneNumber.startsWith('91') && phoneNumber.length === 10) {
-                                    phoneNumber = '91' + phoneNumber;
-                                  }
-                                  if (phoneNumber) {
-                                    window.open(`https://wa.me/${phoneNumber}`, '_blank');
+                                  if (navigator.share) {
+                                    navigator.share({
+                                      title: partner.name || 'Partner',
+                                      text: `Check out ${partner.name || 'this partner'}`,
+                                      url: `${window.location.origin}/partners/pathology/${partner._id || partner.id}`,
+                                    }).catch(() => {});
+                                  } else {
+                                    navigator.clipboard.writeText(`${window.location.origin}/partners/pathology/${partner._id || partner.id}`);
+                                    showToast('Link copied to clipboard!', 'success');
                                   }
                                 }}
                               >
-                                <svg className="h-3 w-3" fill="currentColor" viewBox="0 0 24 24">
-                                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.239-.375a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                                </svg>
-                                WhatsApp
+                                <Share2 className="h-3 w-3" />
+                                Share
                               </button>
                             </div>
                           </div>
@@ -1359,8 +1382,9 @@ export default function Home() {
               </div>
             </div>
           )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
       
       {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-[#10b981] to-[#059669] text-white">

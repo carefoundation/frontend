@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import DataTable from '@/components/admin/DataTable';
 import Button from '@/components/ui/Button';
-import { Eye, Edit, Trash2, Calendar, Loader2 } from 'lucide-react';
+import { Eye, Edit, Trash2, Calendar, Loader2, Users } from 'lucide-react';
 import Link from 'next/link';
 import { api, ApiError } from '@/lib/api';
 import { showToast } from '@/lib/toast';
@@ -25,6 +25,19 @@ interface Event {
   createdAt?: string;
   expectedAttendees?: number;
   time?: string;
+  attendees?: number;
+  registeredUsersCount?: number;
+}
+
+interface RegisteredUser {
+  _id?: string;
+  fullName: string;
+  email: string;
+  mobileNumber: string;
+  city: string;
+  status: string;
+  createdAt?: string;
+  userId?: any;
 }
 
 export default function EventsPage() {
@@ -34,8 +47,11 @@ export default function EventsPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [viewModalOpen, setViewModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
+  const [registeredUsersModalOpen, setRegisteredUsersModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
   const [selectedFullEvent, setSelectedFullEvent] = useState<any | null>(null);
+  const [registeredUsers, setRegisteredUsers] = useState<RegisteredUser[]>([]);
+  const [loadingRegisteredUsers, setLoadingRegisteredUsers] = useState(false);
   const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
@@ -60,6 +76,7 @@ export default function EventsPage() {
           category: event.category || 'General',
           status: event.status || 'upcoming',
           expectedAttendees: event.expectedAttendees || 0,
+          attendees: event.attendees || 0,
           time: event.time || '',
         }));
         setEvents(formatted);
@@ -99,6 +116,35 @@ export default function EventsPage() {
   const handleDeleteClick = (event: Event) => {
     setSelectedEvent(event);
     setDeleteModalOpen(true);
+  };
+
+  const handleRegisteredUsersClick = async (event: Event) => {
+    try {
+      setLoadingRegisteredUsers(true);
+      setSelectedEvent(event);
+      const eventId = event._id || event.id;
+      if (!eventId) {
+        showToast('Event ID not found', 'error');
+        return;
+      }
+      const response = await api.get<RegisteredUser[]>(`/event-registrations/event/${eventId}`);
+      // API client automatically unwraps { success: true, data: [...] } to just the array
+      if (Array.isArray(response)) {
+        setRegisteredUsers(response);
+      } else {
+        setRegisteredUsers([]);
+      }
+      setRegisteredUsersModalOpen(true);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        showToast(error.message, 'error');
+      } else {
+        showToast('Failed to fetch registered', 'error');
+      }
+      setRegisteredUsers([]);
+    } finally {
+      setLoadingRegisteredUsers(false);
+    }
   };
 
   const handleUpdateEvent = async (data: Record<string, any>) => {
@@ -183,9 +229,16 @@ export default function EventsPage() {
       render: (value: string) => value || 'N/A',
     },
     {
-      header: 'Expected Attendees',
+      header: 'Expected count',
       accessor: 'expectedAttendees' as keyof Event,
       render: (value: number) => value || 0,
+    },
+    {
+      header: 'Registered',
+      accessor: 'attendees' as keyof Event,
+      render: (value: number) => (
+        <span className="font-medium text-[#10b981]">{value || 0}</span>
+      ),
     },
     {
       header: 'Location',
@@ -240,6 +293,16 @@ export default function EventsPage() {
               onClick={() => handleViewClick(row)}
             >
               <Eye className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              title="Registered"
+              onClick={() => handleRegisteredUsersClick(row)}
+              disabled={loadingRegisteredUsers}
+              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+            >
+              <Users className="h-4 w-4" />
             </Button>
             <Button 
               variant="ghost" 
@@ -344,6 +407,115 @@ export default function EventsPage() {
           confirmText="Delete"
           variant="danger"
         />
+      )}
+
+      {/* Registered Users Modal */}
+      {selectedEvent && (
+        <div className={`fixed inset-0 z-50 ${registeredUsersModalOpen ? 'block' : 'hidden'}`}>
+          {/* Overlay */}
+          <div
+            className="fixed inset-0 bg-black/50"
+            onClick={() => {
+              setRegisteredUsersModalOpen(false);
+              setSelectedEvent(null);
+              setRegisteredUsers([]);
+            }}
+          />
+          
+          {/* Modal */}
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+              {/* Header */}
+              <div className="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+                <div>
+                  <h2 className="text-2xl font-bold text-gray-900">
+                    Registered- {selectedEvent.title}
+                  </h2>
+                  <p className="text-sm text-gray-600 mt-1">
+                    Total: {registeredUsers.length} registered user{registeredUsers.length !== 1 ? 's' : ''}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    setRegisteredUsersModalOpen(false);
+                    setSelectedEvent(null);
+                    setRegisteredUsers([]);
+                  }}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Content */}
+              <div className="p-6">
+                {loadingRegisteredUsers ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-[#10b981]" />
+                  </div>
+                ) : registeredUsers.length === 0 ? (
+                  <div className="text-center py-12">
+                    <Users className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                    <p className="text-gray-600 text-lg">No registered users yet</p>
+                    <p className="text-gray-500 text-sm mt-2">Users will appear here once they register for this event</p>
+                  </div>
+                ) : (
+                  <div className="overflow-x-auto">
+                    <table className="w-full border-collapse">
+                      <thead>
+                        <tr className="bg-gray-50 border-b border-gray-200">
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">#</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Full Name</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Email</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Mobile Number</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">City</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                          <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Registered Date</th>
+                        </tr>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {registeredUsers.map((user, index) => (
+                          <tr key={user._id || index} className="hover:bg-gray-50">
+                            <td className="px-4 py-3 text-sm text-gray-900">{index + 1}</td>
+                            <td className="px-4 py-3 text-sm font-medium text-gray-900">{user.fullName}</td>
+                            <td className="px-4 py-3 text-sm text-gray-600">{user.email}</td>
+                            <td className="px-4 py-3 text-sm text-gray-600">{user.mobileNumber}</td>
+                            <td className="px-4 py-3 text-sm text-gray-600">{user.city}</td>
+                            <td className="px-4 py-3 text-sm">
+                              <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                                user.status === 'registered' ? 'bg-green-100 text-green-700' :
+                                user.status === 'confirmed' ? 'bg-blue-100 text-blue-700' :
+                                'bg-gray-100 text-gray-700'
+                              }`}>
+                                {user.status || 'registered'}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-sm text-gray-600">
+                              {user.createdAt ? new Date(user.createdAt).toLocaleString() : 'N/A'}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+
+              {/* Footer */}
+              <div className="flex justify-end gap-3 p-6 border-t border-gray-200 sticky bottom-0 bg-white">
+                <Button variant="outline" onClick={() => {
+                  setRegisteredUsersModalOpen(false);
+                  setSelectedEvent(null);
+                  setRegisteredUsers([]);
+                }}>
+                  Close
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

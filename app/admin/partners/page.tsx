@@ -7,6 +7,8 @@ import { Eye, Edit, Trash2, Ban, Building2, Stethoscope, UtensilsCrossed, Micros
 import { api, ApiError } from '@/lib/api';
 import { showToast } from '@/lib/toast';
 import ConfirmModal from '@/components/ui/ConfirmModal';
+import ViewModal from '@/components/admin/ViewModal';
+import EditModal from '@/components/admin/EditModal';
 
 interface Partner {
   _id?: string;
@@ -21,6 +23,17 @@ interface Partner {
   joinDate?: string;
   createdAt?: string;
   status?: string;
+  description?: string;
+  logo?: string;
+  photo?: string;
+  programs?: string[];
+  impact?: string;
+  since?: string;
+  state?: string;
+  pincode?: string;
+  website?: string;
+  isActive?: boolean;
+  formData?: Record<string, any>;
 }
 
 export default function PartnersPage() {
@@ -28,8 +41,12 @@ export default function PartnersPage() {
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [blockModalOpen, setBlockModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
   const [selectedPartner, setSelectedPartner] = useState<Partner | null>(null);
+  const [fullPartnerData, setFullPartnerData] = useState<any>(null);
   const [updating, setUpdating] = useState<string | null>(null);
+  const [loadingPartner, setLoadingPartner] = useState(false);
 
   useEffect(() => {
     fetchPartners();
@@ -119,6 +136,81 @@ export default function PartnersPage() {
     }
   };
 
+  const handleViewClick = async (partner: Partner) => {
+    try {
+      setLoadingPartner(true);
+      setSelectedPartner(partner);
+      const partnerId = partner._id || partner.id;
+      if (!partnerId) {
+        showToast('Partner ID not found', 'error');
+        return;
+      }
+      const data = await api.get<any>(`/partners/${partnerId}`);
+      setFullPartnerData(data);
+      setViewModalOpen(true);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        showToast(error.message, 'error');
+      } else {
+        showToast('Failed to fetch partner details', 'error');
+      }
+    } finally {
+      setLoadingPartner(false);
+    }
+  };
+
+  const handleEditClick = async (partner: Partner) => {
+    try {
+      setLoadingPartner(true);
+      setSelectedPartner(partner);
+      const partnerId = partner._id || partner.id;
+      if (!partnerId) {
+        showToast('Partner ID not found', 'error');
+        return;
+      }
+      const data = await api.get<any>(`/partners/${partnerId}`);
+      setFullPartnerData(data);
+      setEditModalOpen(true);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        showToast(error.message, 'error');
+      } else {
+        showToast('Failed to fetch partner details', 'error');
+      }
+    } finally {
+      setLoadingPartner(false);
+    }
+  };
+
+  const handleEditSave = async (data: Record<string, any>) => {
+    if (!selectedPartner) return;
+
+    // Validate phone number if provided - must be exactly 10 digits
+    if (data.phone && !/^\d{10}$/.test(data.phone.toString().trim())) {
+      showToast('Please enter a valid 10-digit phone number', 'error');
+      return;
+    }
+
+    try {
+      setUpdating(selectedPartner._id || selectedPartner.id || '');
+      const partnerId = selectedPartner._id || selectedPartner.id;
+      await api.put(`/partners/${partnerId}`, data);
+      await fetchPartners();
+      showToast('Partner updated successfully', 'success');
+      setEditModalOpen(false);
+      setSelectedPartner(null);
+      setFullPartnerData(null);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        showToast(error.message, 'error');
+      } else {
+        showToast('Failed to update partner', 'error');
+      }
+    } finally {
+      setUpdating(null);
+    }
+  };
+
   if (loading) {
     return (
       <div className="p-6 lg:p-8 flex items-center justify-center min-h-[400px]">
@@ -186,10 +278,22 @@ export default function PartnersPage() {
         data={partners}
         actions={(row) => (
           <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-            <Button variant="ghost" size="sm" title="View">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              title="View"
+              onClick={() => handleViewClick(row)}
+              disabled={loadingPartner}
+            >
               <Eye className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm" title="Edit">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              title="Edit"
+              onClick={() => handleEditClick(row)}
+              disabled={loadingPartner || updating === (row._id || row.id)}
+            >
               <Edit className="h-4 w-4" />
             </Button>
             <Button
@@ -245,6 +349,130 @@ export default function PartnersPage() {
           onConfirm={handleBlockConfirm}
           confirmText="Block"
           variant="danger"
+        />
+      )}
+
+      {/* View Modal */}
+      {fullPartnerData && (
+        <ViewModal
+          isOpen={viewModalOpen}
+          onClose={() => {
+            setViewModalOpen(false);
+            setSelectedPartner(null);
+            setFullPartnerData(null);
+          }}
+          title="Partner Details"
+          data={{
+            'Name': fullPartnerData.name || 'N/A',
+            'Type': fullPartnerData.type === 'health' ? 'Health' : fullPartnerData.type === 'food' ? 'Food' : fullPartnerData.type || 'N/A',
+            'Email': fullPartnerData.email || 'N/A',
+            'Phone': fullPartnerData.phone || 'N/A',
+            'Description': fullPartnerData.description || 'N/A',
+            'Address': fullPartnerData.address || 'N/A',
+            'City': fullPartnerData.city || 'N/A',
+            'State': fullPartnerData.state || 'N/A',
+            'Pincode': fullPartnerData.pincode || 'N/A',
+            'Website': fullPartnerData.website || 'N/A',
+            'Status': fullPartnerData.status || 'N/A',
+            'Active': fullPartnerData.isActive !== undefined ? (fullPartnerData.isActive ? 'Yes' : 'No') : 'N/A',
+            'Since': fullPartnerData.since || 'N/A',
+            'Impact': fullPartnerData.impact || 'N/A',
+            'Programs': fullPartnerData.programs && Array.isArray(fullPartnerData.programs) ? fullPartnerData.programs.join(', ') : 'N/A',
+            'Join Date': fullPartnerData.createdAt ? new Date(fullPartnerData.createdAt).toLocaleString() : 'N/A',
+            'Last Updated': fullPartnerData.updatedAt ? new Date(fullPartnerData.updatedAt).toLocaleString() : 'N/A',
+            ...(fullPartnerData.logo ? { 'Logo': fullPartnerData.logo } : {}),
+            ...(fullPartnerData.photo ? { 'Photo': fullPartnerData.photo } : {}),
+            ...(fullPartnerData.formData ? Object.entries(fullPartnerData.formData).reduce((acc, [key, value]) => {
+              if (value !== null && value !== undefined && value !== '') {
+                // Check for image/PDF fields
+                const imageFields = ['image', 'images', 'banner', 'logo', 'photo', 'pharmacyImages', 'labImages', 'hospitalImages', 'restaurantImages', 'clinicPhotos', 'panCard', 'aadharCard'];
+                const pdfFields = ['businessLicense', 'drugLicense', 'labLicense', 'license', 'document', 'documents', 'foodLicense'];
+                
+                if (imageFields.some(field => key.toLowerCase().includes(field))) {
+                  // Handle image fields
+                  if (Array.isArray(value)) {
+                    value.forEach((img: any, idx: number) => {
+                      acc[`${key} ${idx + 1}`] = img;
+                    });
+                  } else {
+                    acc[key] = value;
+                  }
+                } else if (pdfFields.some(field => key.toLowerCase().includes(field))) {
+                  // Handle PDF fields
+                  acc[key] = value;
+                } else if (typeof value === 'object' && !Array.isArray(value)) {
+                  acc[`${key} (Details)`] = value;
+                } else if (Array.isArray(value)) {
+                  acc[key] = value.join(', ');
+                } else {
+                  acc[key] = String(value);
+                }
+              }
+              return acc;
+            }, {} as Record<string, any>) : {}),
+          }}
+        />
+      )}
+
+      {/* Edit Modal */}
+      {fullPartnerData && (
+        <EditModal
+          isOpen={editModalOpen}
+          onClose={() => {
+            setEditModalOpen(false);
+            setSelectedPartner(null);
+            setFullPartnerData(null);
+          }}
+          title={`Edit Partner: ${fullPartnerData.name || 'Unknown'}`}
+          fields={[
+            { key: 'name', label: 'Name', type: 'text' },
+            { 
+              key: 'type', 
+              label: 'Type', 
+              type: 'select',
+              options: [
+                { value: 'health', label: 'Health' },
+                { value: 'food', label: 'Food' }
+              ]
+            },
+            { key: 'email', label: 'Email', type: 'email' },
+            { key: 'phone', label: 'Phone', type: 'text' },
+            { key: 'description', label: 'Description', type: 'textarea' },
+            { key: 'address', label: 'Address', type: 'text' },
+            { key: 'city', label: 'City', type: 'text' },
+            { key: 'state', label: 'State', type: 'text' },
+            { key: 'pincode', label: 'Pincode', type: 'text' },
+            { key: 'website', label: 'Website', type: 'text' },
+            { 
+              key: 'status', 
+              label: 'Status', 
+              type: 'select',
+              options: [
+                { value: 'pending', label: 'Pending' },
+                { value: 'approved', label: 'Approved' },
+                { value: 'rejected', label: 'Rejected' },
+                { value: 'active', label: 'Active' }
+              ]
+            },
+            { key: 'since', label: 'Since', type: 'text' },
+            { key: 'impact', label: 'Impact', type: 'textarea' },
+          ]}
+          initialData={{
+            name: fullPartnerData.name || '',
+            type: fullPartnerData.type || 'health',
+            email: fullPartnerData.email || '',
+            phone: fullPartnerData.phone || '',
+            description: fullPartnerData.description || '',
+            address: fullPartnerData.address || '',
+            city: fullPartnerData.city || '',
+            state: fullPartnerData.state || '',
+            pincode: fullPartnerData.pincode || '',
+            website: fullPartnerData.website || '',
+            status: fullPartnerData.status || 'pending',
+            since: fullPartnerData.since || '',
+            impact: fullPartnerData.impact || '',
+          }}
+          onSave={handleEditSave}
         />
       )}
     </div>

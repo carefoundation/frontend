@@ -1,9 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Calendar, MapPin, Clock, Users, ArrowRight, Loader2, X, CheckCircle, Share2, Facebook, Twitter, Instagram, Copy } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, ArrowRight, Loader2, X, CheckCircle, Share2, Download } from 'lucide-react';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 import Footer from '@/components/layout/Footer';
 import Card from '@/components/ui/Card';
 import Link from 'next/link';
@@ -27,6 +29,9 @@ export default function EventsPage() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
+  const [ticketId, setTicketId] = useState<string | null>(null);
+  const [downloadingTicket, setDownloadingTicket] = useState(false);
+  const ticketRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Check login status
@@ -200,6 +205,17 @@ export default function EventsPage() {
       const whatsappText = `Join us at ${event.title} by Care Foundation Trust®!\n\n📅 ${eventDate}${event.time ? `\n⏰ ${event.time}` : ''}\n📍 ${event.location}\n\n${eventUrl}`;
       const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
       window.open(whatsappUrl, '_blank');
+    } else if (platform === 'native') {
+      if (navigator.share) {
+        navigator.share({
+          title: `${event.title} - Care Foundation Trust®`,
+          text: shareText,
+          url: eventUrl,
+        }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(eventUrl);
+        showToast('Event link copied to clipboard!', 'success');
+      }
     }
   };
 
@@ -210,6 +226,7 @@ export default function EventsPage() {
     setSelectedEvent(event);
     setRegistrationModalOpen(true);
     setRegistrationSuccess(false);
+    setTicketId(null);
     setRegistrationForm({
       fullName: '',
       email: '',
@@ -236,9 +253,16 @@ export default function EventsPage() {
       return;
     }
 
+    // Validate mobile number - must be exactly 10 digits
+    const mobileRegex = /^\d{10}$/;
+    if (!mobileRegex.test(registrationForm.mobileNumber)) {
+      showToast('Please enter a valid 10-digit mobile number', 'error');
+      return;
+    }
+
     try {
       setIsSubmitting(true);
-      await api.post('/event-registrations/register', {
+      const response = await api.post<{ _id: string; id?: string }>('/event-registrations/register', {
         eventId: selectedEvent.id,
         fullName: registrationForm.fullName,
         email: registrationForm.email,
@@ -246,18 +270,21 @@ export default function EventsPage() {
         city: registrationForm.city,
       });
 
+      // Generate unique ticket ID from registration response
+      const registrationId = (response as any)?._id || (response as any)?.id;
+      const eventIdShort = selectedEvent.id?.slice(-6).toUpperCase() || 'EVENT';
+      const ticketNumber = registrationId 
+        ? `CFT-${eventIdShort}-${registrationId.slice(-8).toUpperCase()}`
+        : `CFT-${eventIdShort}-${Date.now().toString(36).toUpperCase()}-${Math.random().toString(36).substring(2, 10).toUpperCase()}`;
+      
+      setTicketId(ticketNumber);
       setRegistrationSuccess(true);
-      showToast("You're registered 🎉", 'success');
+      showToast("Successfully Registered! 🎉", 'success');
       
       // Refresh events to update attendee count
       await fetchEvents();
       
-      // Keep success page open for 5 seconds before closing
-      setTimeout(() => {
-        setRegistrationModalOpen(false);
-        setRegistrationSuccess(false);
-        setSelectedEvent(null);
-      }, 5000);
+      // Modal will stay open until user explicitly closes it
     } catch (error) {
       if (error instanceof ApiError) {
         showToast(error.message || 'Registration failed. Please try again.', 'error');
@@ -266,6 +293,81 @@ export default function EventsPage() {
       }
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleDownloadTicket = async () => {
+    if (!ticketId || !selectedEvent || !ticketRef.current) {
+      showToast('Ticket information not available', 'error');
+      return;
+    }
+
+    try {
+      setDownloadingTicket(true);
+      showToast('Generating ticket PDF...', 'info');
+
+      // Make ticket visible temporarily for rendering
+      const originalDisplay = ticketRef.current.style.display;
+      ticketRef.current.style.display = 'block';
+      ticketRef.current.style.position = 'absolute';
+      ticketRef.current.style.left = '-9999px';
+      ticketRef.current.style.visibility = 'visible';
+      
+      // Wait for rendering
+      await new Promise(resolve => setTimeout(resolve, 300));
+
+      // Convert HTML to canvas
+      const canvas = await html2canvas(ticketRef.current, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        width: ticketRef.current.offsetWidth,
+        height: ticketRef.current.offsetHeight,
+      });
+      
+      // Restore original display
+      ticketRef.current.style.display = originalDisplay || 'none';
+      ticketRef.current.style.position = '';
+      ticketRef.current.style.left = '';
+      ticketRef.current.style.visibility = '';
+
+      // Create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
+      
+      // Calculate dimensions to fit the ticket
+      const imgWidth = canvas.width;
+      const imgHeight = canvas.height;
+      const ratio = imgWidth / imgHeight;
+      
+      let finalWidth = pdfWidth - 20; // 10mm margin on each side
+      let finalHeight = finalWidth / ratio;
+      
+      // If height is too large, scale down
+      if (finalHeight > pdfHeight - 20) {
+        finalHeight = pdfHeight - 20;
+        finalWidth = finalHeight * ratio;
+      }
+
+      // Center the image
+      const xOffset = (pdfWidth - finalWidth) / 2;
+      const yOffset = (pdfHeight - finalHeight) / 2;
+
+      const imgData = canvas.toDataURL('image/png');
+      pdf.addImage(imgData, 'PNG', xOffset, yOffset, finalWidth, finalHeight);
+      
+      // Save PDF
+      const fileName = `Event_Ticket_${ticketId.replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+      pdf.save(fileName);
+      
+      showToast('Ticket downloaded successfully!', 'success');
+    } catch (error) {
+      console.error('Download error:', error);
+      showToast('Failed to download ticket', 'error');
+    } finally {
+      setDownloadingTicket(false);
     }
   };
 
@@ -353,7 +455,7 @@ export default function EventsPage() {
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-600">
                       <Users className="h-4 w-4 text-[#10b981]" />
-                      {event.expectedAttendees > 0 ? event.expectedAttendees : event.attendees} expected attendees
+                      {event.expectedAttendees > 0 ? event.expectedAttendees : event.attendees} expected count
                     </div>
                   </div>
 
@@ -375,51 +477,17 @@ export default function EventsPage() {
                     
                     <div className="border-t border-gray-200 pt-3">
                       <p className="text-xs text-gray-600 mb-2 font-medium">Share this event</p>
-                      <div className="flex gap-2">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleShare(event, 'facebook');
-                          }}
-                          className="flex-1 py-2 px-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-1"
-                          title="Share on Facebook"
-                        >
-                          <Facebook className="h-3.5 w-3.5" />
-                          <span className="text-xs hidden sm:inline">Facebook</span>
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleShare(event, 'twitter');
-                          }}
-                          className="flex-1 py-2 px-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors flex items-center justify-center gap-1"
-                          title="Share on Twitter"
-                        >
-                          <Twitter className="h-3.5 w-3.5" />
-                          <span className="text-xs hidden sm:inline">Twitter</span>
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleShare(event, 'whatsapp');
-                          }}
-                          className="flex-1 py-2 px-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-1"
-                          title="Share on WhatsApp"
-                        >
-                          <Share2 className="h-3.5 w-3.5" />
-                          <span className="text-xs hidden sm:inline">WhatsApp</span>
-                        </button>
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleShare(event, 'copy');
-                          }}
-                          className="py-2 px-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                          title="Copy link"
-                        >
-                          <Copy className="h-3.5 w-3.5 text-gray-700" />
-                        </button>
-                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleShare(event, 'native');
+                        }}
+                        className="w-full py-2 px-2 bg-[#10b981] text-white rounded-lg hover:bg-[#059669] transition-colors flex items-center justify-center gap-1 font-medium"
+                        title="Share"
+                      >
+                        <Share2 className="h-3.5 w-3.5" />
+                        <span className="text-xs">Share</span>
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -488,22 +556,121 @@ export default function EventsPage() {
           <div
             className="fixed inset-0 bg-black/50 z-50"
             onClick={() => {
-              if (!isSubmitting) {
+              if (!isSubmitting && !downloadingTicket) {
                 setRegistrationModalOpen(false);
                 setSelectedEvent(null);
                 setRegistrationSuccess(false);
+                setTicketId(null);
               }
             }}
           />
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={(e) => {
+            // Close modal when clicking on the overlay (outside the modal content)
+            if (e.target === e.currentTarget && !isSubmitting && !downloadingTicket) {
+              setRegistrationModalOpen(false);
+              setSelectedEvent(null);
+              setRegistrationSuccess(false);
+              setTicketId(null);
+            }
+          }}>
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full" onClick={(e) => e.stopPropagation()}>
               {registrationSuccess ? (
                 <div className="p-8 text-center">
                   <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-4">
                     <CheckCircle className="h-10 w-10 text-green-600" />
                   </div>
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">You're registered 🎉</h2>
-                  <p className="text-gray-600 mb-4">Thank you for registering for {selectedEvent.title}!</p>
+                  <h2 className="text-2xl font-bold text-gray-900 mb-2">Successfully Registered! 🎉</h2>
+                  <p className="text-gray-600 mb-6">Thank you for registering for {selectedEvent.title}!</p>
+                  
+                  {/* Ticket Template for Download */}
+                  <div ref={ticketRef} className="hidden">
+                    <div style={{ 
+                      backgroundColor: '#ffffff', 
+                      padding: '32px', 
+                      maxWidth: '448px', 
+                      margin: '0 auto', 
+                      border: '2px solid #10b981', 
+                      borderRadius: '8px',
+                      fontFamily: 'system-ui, -apple-system, sans-serif'
+                    }}>
+                      <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+                        <h3 style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981', marginBottom: '8px' }}>
+                          Care Foundation Trust®
+                        </h3>
+                        <p style={{ fontSize: '14px', color: '#4b5563' }}>Event Registration Ticket</p>
+                      </div>
+                      
+                      {ticketId && (
+                        <div style={{ 
+                          marginBottom: '24px', 
+                          padding: '16px', 
+                          background: 'linear-gradient(to right, #10b981, #059669)', 
+                          borderRadius: '8px', 
+                          color: '#ffffff', 
+                          textAlign: 'center' 
+                        }}>
+                          <p style={{ fontSize: '14px', fontWeight: '500', marginBottom: '8px', opacity: 0.9 }}>
+                            Ticket Number
+                          </p>
+                          <p style={{ fontSize: '30px', fontWeight: 'bold', letterSpacing: '0.05em' }}>
+                            {ticketId}
+                          </p>
+                        </div>
+                      )}
+                      
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px', textAlign: 'left' }}>
+                        <div>
+                          <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Event Name</p>
+                          <p style={{ fontSize: '18px', fontWeight: '600', color: '#111827' }}>{selectedEvent.title}</p>
+                        </div>
+                        <div>
+                          <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Date</p>
+                          <p style={{ fontSize: '16px', color: '#111827' }}>
+                            {new Date(selectedEvent.date).toLocaleDateString('en-US', { 
+                              weekday: 'long', 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric' 
+                            })}
+                          </p>
+                        </div>
+                        {selectedEvent.time && (
+                          <div>
+                            <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Time</p>
+                            <p style={{ fontSize: '16px', color: '#111827' }}>
+                              Start: <span style={{ color: '#10b981', fontWeight: '600' }}>{formatTime(selectedEvent.time)}</span>
+                            </p>
+                          </div>
+                        )}
+                        <div>
+                          <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Location</p>
+                          <p style={{ fontSize: '16px', color: '#111827' }}>{selectedEvent.location}</p>
+                        </div>
+                        <div>
+                          <p style={{ fontSize: '12px', color: '#6b7280', marginBottom: '4px' }}>Registered By</p>
+                          <p style={{ fontSize: '16px', color: '#111827' }}>{registrationForm.fullName}</p>
+                          <p style={{ fontSize: '14px', color: '#4b5563' }}>{registrationForm.email}</p>
+                        </div>
+                      </div>
+                      
+                      <div style={{ borderTop: '1px solid #e5e7eb', paddingTop: '16px', textAlign: 'center' }}>
+                        <p style={{ fontSize: '12px', color: '#6b7280' }}>Please bring this ticket to the event</p>
+                        <p style={{ fontSize: '12px', color: '#9ca3af', marginTop: '4px' }}>
+                          Generated on {new Date().toLocaleString()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Unique Ticket Display */}
+                  {ticketId && (
+                    <div className="mb-6 p-5 bg-gradient-to-r from-[#10b981] to-[#059669] rounded-lg text-white">
+                      <p className="text-sm font-medium mb-2 opacity-90">Your Unique Ticket Number</p>
+                      <p className="text-2xl font-bold tracking-wider">{ticketId}</p>
+                      <p className="text-xs mt-2 opacity-80">Please save this ticket number for your records</p>
+                    </div>
+                  )}
+                  
                   <div className="mt-6 p-4 bg-gray-50 rounded-lg text-left">
                     <h3 className="font-semibold text-gray-900 mb-2">Event Details:</h3>
                     <p className="text-sm text-gray-600 mb-1">
@@ -518,7 +685,7 @@ export default function EventsPage() {
                     {selectedEvent.time && (
                       <p className="text-sm text-gray-600 mb-1">
                         <Clock className="h-4 w-4 inline mr-2" />
-                        {selectedEvent.time}
+                        Start: <span className="text-[#10b981] font-semibold">{formatTime(selectedEvent.time)}</span>
                       </p>
                     )}
                     <p className="text-sm text-gray-600">
@@ -526,7 +693,29 @@ export default function EventsPage() {
                       {selectedEvent.location}
                     </p>
                   </div>
-                  <p className="text-xs text-gray-500 mt-4">This window will close automatically...</p>
+                  
+                  {/* Download Button */}
+                  {ticketId && (
+                    <div className="mt-6">
+                      <Button
+                        onClick={handleDownloadTicket}
+                        disabled={downloadingTicket}
+                        className="w-full bg-[#10b981] hover:bg-[#059669] text-white"
+                      >
+                        {downloadingTicket ? (
+                          <>
+                            <Loader2 className="h-4 w-4 mr-2 animate-spin inline" />
+                            Generating PDF...
+                          </>
+                        ) : (
+                          <>
+                            <Download className="h-4 w-4 mr-2 inline" />
+                            Download Ticket
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <>
@@ -534,13 +723,15 @@ export default function EventsPage() {
                     <h2 className="text-2xl font-bold text-gray-900">Register for Event</h2>
                     <button
                       onClick={() => {
-                        if (!isSubmitting) {
+                        if (!isSubmitting && !downloadingTicket) {
                           setRegistrationModalOpen(false);
                           setSelectedEvent(null);
+                          setRegistrationSuccess(false);
+                          setTicketId(null);
                         }
                       }}
                       className="text-gray-400 hover:text-gray-600 transition-colors"
-                      disabled={isSubmitting}
+                      disabled={isSubmitting || downloadingTicket}
                     >
                       <X className="h-6 w-6" />
                     </button>
@@ -599,10 +790,15 @@ export default function EventsPage() {
                           type="tel"
                           required
                           value={registrationForm.mobileNumber}
-                          onChange={(e) => setRegistrationForm({ ...registrationForm, mobileNumber: e.target.value })}
+                          onChange={(e) => {
+                            const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                            if (value.length <= 10) {
+                              setRegistrationForm({ ...registrationForm, mobileNumber: value });
+                            }
+                          }}
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
-                          placeholder="+91 9876543210"
-                          maxLength={15}
+                          placeholder="9876543210"
+                          maxLength={10}
                           disabled={isSubmitting}
                         />
                       </div>
@@ -632,6 +828,8 @@ export default function EventsPage() {
                           if (!isSubmitting) {
                             setRegistrationModalOpen(false);
                             setSelectedEvent(null);
+                            setRegistrationSuccess(false);
+                            setTicketId(null);
                           }
                         }}
                         disabled={isSubmitting}

@@ -68,14 +68,16 @@ export default function LoginPage() {
         // Check if admin or staff
         if (user && user.role === 'admin') {
           setAdminSession();
+          // Use replace instead of push for faster navigation
+          router.replace('/admin/dashboard');
           setIsLoading(false);
-          router.push('/admin/dashboard');
           return;
         }
         if (user && user.role === 'staff') {
           setAdminSession();
+          // Use replace instead of push for faster navigation
+          router.replace('/staff/dashboard');
           setIsLoading(false);
-          router.push('/staff/dashboard');
           return;
         }
         
@@ -102,14 +104,16 @@ export default function LoginPage() {
         
         if (response.user.role === 'admin') {
           setAdminSession();
+          // Use replace instead of push for faster navigation
+          router.replace('/admin/dashboard');
           setIsLoading(false);
-          router.push('/admin/dashboard');
           return;
         }
         if (response.user.role === 'staff') {
           setAdminSession();
+          // Use replace instead of push for faster navigation
+          router.replace('/staff/dashboard');
           setIsLoading(false);
-          router.push('/staff/dashboard');
           return;
         }
         

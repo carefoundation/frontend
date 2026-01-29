@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ArrowLeft, MapPin, Phone, Mail, Clock, Map, Stethoscope, Heart, Loader2, Ticket, X, QrCode, Copy, CheckCircle, Share2, Facebook, Twitter, Linkedin, MessageCircle } from 'lucide-react';
+import { ArrowLeft, MapPin, Phone, Mail, Clock, Map, Stethoscope, Heart, Loader2, Ticket, X, QrCode, Copy, CheckCircle, Share2, Facebook, Twitter, Linkedin, MessageCircle, User, Award, GraduationCap, Building, DollarSign, Calendar, ExternalLink } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -123,6 +123,12 @@ export default function HealthPartnerDetailPage() {
   };
 
   const handleViewMap = () => {
+    // Prioritize Google Business Link
+    if (partner?.formData?.googleBusinessLink) {
+      window.open(partner.formData.googleBusinessLink, '_blank');
+      return;
+    }
+    
     // Check for map link in various possible fields
     const mapLink = partner?.mapLink || partner?.mapUrl || partner?.map_link || partner?.map_url || 
                     partner?.googleMap || partner?.google_map ||
@@ -140,7 +146,7 @@ export default function HealthPartnerDetailPage() {
         const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`;
         window.open(mapUrl, '_blank');
       } else {
-        showToast('Map link or address not available', 'error');
+        showToast('Google Business Link not available', 'error');
       }
     }
   };
@@ -186,7 +192,7 @@ export default function HealthPartnerDetailPage() {
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Partner Not Found</h1>
           <Button onClick={() => router.push('/partners/health')}>
             <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Health Partners
+            Back to Doctors for u
           </Button>
         </div>
       </div>
@@ -194,7 +200,7 @@ export default function HealthPartnerDetailPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16">
+    <div className="min-h-screen bg-gray-50 pt-16 pb-8">
       <div className="w-full px-4 sm:px-6 lg:px-8">
         <div className="px-4 sm:px-6 lg:px-8 py-4 sm:py-6">
           <button
@@ -206,11 +212,11 @@ export default function HealthPartnerDetailPage() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-[5px]">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
           <div className="lg:col-span-7">
             <div className="relative h-64 sm:h-80 lg:h-96 w-full overflow-hidden bg-gray-200">
               <Image
-                src={partner.photo || partner.logo || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&h=600&fit=crop'}
+                src={partner.formData?.banner || partner.photo || partner.logo || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&h=600&fit=crop'}
                 alt={partner.name || partner.businessName || 'Partner'}
                 fill
                 className="object-cover"
@@ -230,25 +236,210 @@ export default function HealthPartnerDetailPage() {
               </div>
             </div>
 
-            <Card className="rounded-none border-0 shadow-none p-6 sm:p-8 lg:p-10 bg-white">
+            <Card className="rounded-none border-0 shadow-none p-6 sm:p-8 lg:p-10 pb-8 sm:pb-10 lg:pb-12 bg-white">
               <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">{partner.name || partner.businessName}</h1>
               <p className="text-gray-600 text-lg sm:text-xl mb-8 leading-relaxed">{partner.description || partner.about}</p>
 
-              <div className="mb-8">
-                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4">Programs</h2>
-                <div className="flex flex-wrap gap-3 sm:gap-4">
-                  {(partner.programs || []).map((program: string, index: number) => (
-                    <span
-                      key={index}
-                      className="px-4 sm:px-5 py-2 sm:py-3 bg-gradient-to-r from-[#ecfdf5] to-[#d1fae5] text-[#10b981] text-sm sm:text-base font-bold rounded-xl border-2 border-[#10b981]/30 shadow-sm hover:shadow-md transition-all"
-                    >
-                      {program}
-                    </span>
-                  ))}
-                </div>
-              </div>
+              {/* Doctor Details Section */}
+              {partner.formData && (
+                <div className="mb-8 pb-6 space-y-6">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6 border-b-2 border-gray-200 pb-3">Doctor Information</h2>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Username */}
+                    {partner.formData.username && (
+                      <div className="flex items-start gap-3">
+                        <User className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Username</div>
+                          <div className="text-base font-medium text-gray-900">{partner.formData.username}</div>
+                        </div>
+                      </div>
+                    )}
 
-              <div className="pt-6 sm:pt-8 border-t-2 border-gray-200">
+                    {/* Registration Number */}
+                    {partner.formData.registrationNo && (
+                      <div className="flex items-start gap-3">
+                        <Award className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Registration No.</div>
+                          <div className="text-base font-medium text-gray-900">{partner.formData.registrationNo}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Qualification */}
+                    {partner.formData.qualification && (
+                      <div className="flex items-start gap-3">
+                        <GraduationCap className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Qualification</div>
+                          <div className="text-base font-medium text-gray-900">{partner.formData.qualification}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Specialization */}
+                    {partner.formData.specialization && (
+                      <div className="flex items-start gap-3">
+                        <Stethoscope className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Specialization</div>
+                          <div className="text-base font-medium text-gray-900">{partner.formData.specialization}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Doctor Fees */}
+                    {partner.formData.doctorFees && (
+                      <div className="flex items-start gap-3">
+                        <DollarSign className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Doctor's Actual Fees</div>
+                          <div className="text-base font-medium text-gray-900">₹{partner.formData.doctorFees}</div>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Foundation Fees */}
+                    {partner.formData.foundationFees && (
+                      <div className="flex items-start gap-3">
+                        <Heart className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div>
+                          <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Fees For Care Foundation Trust®</div>
+                          <div className="text-base font-medium text-gray-900">₹{partner.formData.foundationFees}</div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Operating Hours */}
+                  {(partner.formData.operatingHours || partner.formData.timing) && (
+                    <div className="pt-6 border-t-2 border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <Calendar className="h-5 w-5 text-[#10b981]" />
+                        Operating Hours
+                      </h3>
+                      <div className="space-y-4">
+                        {/* Morning Time */}
+                        {(() => {
+                          const timing = partner.formData.operatingHours || partner.formData.timing;
+                          const morning = timing?.morning;
+                          return morning && (morning.from || morning.to) && (
+                          <div className="bg-[#ecfdf5] p-4 rounded-lg">
+                            <div className="font-semibold text-gray-900 mb-2">Morning Time</div>
+                            <div className="text-sm text-gray-700">
+                              {morning.from && morning.to ? (
+                                <>
+                                  <span className="font-medium">{morning.from}</span>
+                                  {' → '}
+                                  <span className="font-medium">{morning.to}</span>
+                                </>
+                              ) : (
+                                <span className="text-gray-500">Not specified</span>
+                              )}
+                            </div>
+                            {morning.days && morning.days.length > 0 && (
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {morning.days.map((day: string, index: number) => (
+                                  <span key={index} className="px-2 py-1 bg-white text-[#10b981] text-xs font-medium rounded">
+                                    {day}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                        })()}
+
+                        {/* Evening Time */}
+                        {(() => {
+                          const timing = partner.formData.operatingHours || partner.formData.timing;
+                          const evening = timing?.evening;
+                          return evening && (evening.from || evening.to) && (
+                          <div className="bg-[#ecfdf5] p-4 rounded-lg">
+                            <div className="font-semibold text-gray-900 mb-2">Evening Time</div>
+                            <div className="text-sm text-gray-700">
+                              {evening.from && evening.to ? (
+                                <>
+                                  <span className="font-medium">{evening.from}</span>
+                                  {' → '}
+                                  <span className="font-medium">{evening.to}</span>
+                                </>
+                              ) : (
+                                <span className="text-gray-500">Not specified</span>
+                              )}
+                            </div>
+                            {evening.days && evening.days.length > 0 && (
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {evening.days.map((day: string, index: number) => (
+                                  <span key={index} className="px-2 py-1 bg-white text-[#10b981] text-xs font-medium rounded">
+                                    {day}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                        })()}
+
+                        {/* Night Time */}
+                        {(() => {
+                          const timing = partner.formData.operatingHours || partner.formData.timing;
+                          const night = timing?.night;
+                          return night && (night.from || night.to) && (
+                          <div className="bg-[#ecfdf5] p-4 rounded-lg">
+                            <div className="font-semibold text-gray-900 mb-2">Night Time</div>
+                            <div className="text-sm text-gray-700">
+                              {night.from && night.to ? (
+                                <>
+                                  <span className="font-medium">{night.from}</span>
+                                  {' → '}
+                                  <span className="font-medium">{night.to}</span>
+                                </>
+                              ) : (
+                                <span className="text-gray-500">Not specified</span>
+                              )}
+                            </div>
+                            {night.days && night.days.length > 0 && (
+                              <div className="mt-2 flex flex-wrap gap-2">
+                                {night.days.map((day: string, index: number) => (
+                                  <span key={index} className="px-2 py-1 bg-white text-[#10b981] text-xs font-medium rounded">
+                                    {day}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        );
+                        })()}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Google Business Link */}
+                  {partner.formData.googleBusinessLink && (
+                    <div className="pt-6 border-t-2 border-gray-200">
+                      <div className="flex items-center gap-3">
+                        <ExternalLink className="h-5 w-5 text-[#10b981]" />
+                        <div>
+                          <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Google Business Link</div>
+                          <a 
+                            href={partner.formData.googleBusinessLink} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            className="text-base font-medium text-[#10b981] hover:underline break-all"
+                          >
+                            {partner.formData.googleBusinessLink}
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <div className="pt-6 sm:pt-8 pb-4 sm:pb-6 border-t-2 border-gray-200">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6">
                   {partner.impact && (
                     <div className="bg-gray-50 px-4 py-3 rounded-lg">
@@ -268,7 +459,7 @@ export default function HealthPartnerDetailPage() {
           </div>
 
           <div className="lg:col-span-5">
-            <Card className="rounded-none shadow-none p-5 sm:p-6 lg:p-8 lg:sticky lg:top-20 h-full lg:min-h-screen bg-gray-50">
+            <Card className="rounded-none shadow-none p-5 sm:p-6 lg:p-8 lg:sticky lg:top-20 bg-gray-50">
               <div className="mb-6 sm:mb-8">
                 <div className="flex items-center gap-3 mb-5 sm:mb-6 pb-4 sm:pb-5 border-b-2 border-gray-300">
                   <div className="bg-[#10b981] p-2 rounded-lg">
@@ -305,7 +496,17 @@ export default function HealthPartnerDetailPage() {
                     <div className="text-xs font-semibold text-gray-500 mb-1.5 sm:mb-2 uppercase tracking-wide">Address</div>
                     <div className="flex items-start gap-2 sm:gap-2.5 text-sm text-gray-700">
                       <MapPin className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#10b981] flex-shrink-0 mt-0.5" />
-                      <span className="font-medium">{partner.address || `${partner.city || ''} ${partner.state || ''}`.trim() || 'N/A'}</span>
+                      <div className="font-medium">
+                        {partner.address && <div>{partner.address}</div>}
+                        {(partner.city || partner.state) && (
+                          <div>
+                            {partner.city && <span>{partner.city}</span>}
+                            {partner.city && partner.state && <span>, </span>}
+                            {partner.state && <span>{partner.state}</span>}
+                          </div>
+                        )}
+                        {!partner.address && !partner.city && !partner.state && <span>N/A</span>}
+                      </div>
                     </div>
                   </div>
 

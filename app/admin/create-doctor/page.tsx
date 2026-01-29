@@ -1,13 +1,22 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { Stethoscope, Upload, Clock, Sun, Moon, Building2, FileText, AlertTriangle, MapPin, User, Loader2 } from 'lucide-react';
+import { Stethoscope, Upload, Clock, Sun, Moon, Building2, FileText, AlertTriangle, MapPin, User, Loader2, X } from 'lucide-react';
 import Link from 'next/link';
 import { api, ApiError } from '@/lib/api';
 import { showToast } from '@/lib/toast';
+
+const Cropper = dynamic<import('react-easy-crop').CropperProps>(
+  () => import('react-easy-crop'),
+  { 
+    ssr: false,
+    loading: () => <div className="flex items-center justify-center h-96"><Loader2 className="h-8 w-8 animate-spin text-[#10b981]" /></div>
+  }
+);
 
 const daysOfWeek = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const indianStates = [
@@ -77,16 +86,192 @@ export default function CreateDoctorPage() {
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCropModal, setShowCropModal] = useState(false);
+  const [imageToCrop, setImageToCrop] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
+  const [croppedPreview, setCroppedPreview] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    // For phone number fields, only allow digits and limit to 10 digits
+    if (name === 'contactNumber' || name === 'contactPhone') {
+      const numericValue = value.replace(/\D/g, ''); // Remove non-digits
+      if (numericValue.length <= 10) {
+        setFormData(prev => ({ ...prev, [name]: numericValue }));
+      }
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
+  const resizeImage = (file: File, maxWidth: number = 1920, maxHeight: number = 1080, quality: number = 0.9): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          let width = img.width;
+          let height = img.height;
+
+          if (width > maxWidth || height > maxHeight) {
+            if (width > height) {
+              height = (height * maxWidth) / width;
+              width = maxWidth;
+            } else {
+              width = (width * maxHeight) / height;
+              height = maxHeight;
+            }
+          }
+
+          const canvas = document.createElement('canvas');
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext('2d');
+          
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+
+          ctx.drawImage(img, 0, 0, width, height);
+          canvas.toBlob(
+            (blob) => {
+              if (!blob) {
+                reject(new Error('Failed to create blob'));
+                return;
+              }
+              const reader = new FileReader();
+              reader.onloadend = () => resolve(reader.result as string);
+              reader.onerror = reject;
+              reader.readAsDataURL(blob);
+            },
+            'image/jpeg',
+            quality
+          );
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const createImage = (url: string): Promise<HTMLImageElement> =>
+    new Promise((resolve, reject) => {
+      const image = new Image();
+      image.addEventListener('load', () => resolve(image));
+      image.addEventListener('error', (error) => reject(error));
+      image.src = url;
+    });
+
+  const getCroppedImg = async (imageSrc: string, pixelCrop: any, maxWidth: number = 1200, maxHeight: number = 675, quality: number = 0.75): Promise<string> => {
+    const image = await createImage(imageSrc);
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    if (!ctx) {
+      throw new Error('No 2d context');
+    }
+
+    let finalWidth = pixelCrop.width;
+    let finalHeight = pixelCrop.height;
+
+    if (finalWidth > maxWidth || finalHeight > maxHeight) {
+      const aspectRatio = finalWidth / finalHeight;
+      if (finalWidth > finalHeight) {
+        finalWidth = maxWidth;
+        finalHeight = maxWidth / aspectRatio;
+      } else {
+        finalHeight = maxHeight;
+        finalWidth = maxHeight * aspectRatio;
+      }
+    }
+
+    canvas.width = finalWidth;
+    canvas.height = finalHeight;
+
+    ctx.drawImage(
+      image,
+      pixelCrop.x,
+      pixelCrop.y,
+      pixelCrop.width,
+      pixelCrop.height,
+      0,
+      0,
+      finalWidth,
+      finalHeight
+    );
+
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          resolve('');
+          return;
+        }
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result as string);
+        reader.readAsDataURL(blob);
+      }, 'image/jpeg', quality);
+    });
+  };
+
+  const onCropComplete = useCallback(async (croppedArea: any, croppedAreaPixels: any) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+    if (imageToCrop && croppedAreaPixels) {
+      try {
+        const preview = await getCroppedImg(imageToCrop, croppedAreaPixels, 800, 450, 0.8);
+        setCroppedPreview(preview);
+      } catch (error) {
+        console.error('Preview error:', error);
+      }
+    }
+  }, [imageToCrop]);
+
+  const handleCropComplete = async () => {
+    if (!imageToCrop || !croppedAreaPixels) return;
+
+    try {
+      const croppedImageDataUrl = await getCroppedImg(imageToCrop, croppedAreaPixels, 1200, 675, 0.75);
+      
+      // Convert data URL to File
+      const response = await fetch(croppedImageDataUrl);
+      const blob = await response.blob();
+      const file = new File([blob], 'banner.jpg', { type: 'image/jpeg' });
+      
+      setFiles(prev => ({ ...prev, banner: file }));
+      setShowCropModal(false);
+      setImageToCrop(null);
+      setCroppedPreview(null);
+      setCrop({ x: 0, y: 0 });
+      setZoom(1);
+      showToast('Image cropped successfully', 'success');
+    } catch (error) {
+      showToast('Failed to crop image', 'error');
+    }
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>, field: string) => {
     if (e.target.files) {
       if (field === 'clinicPhotos') {
         setFiles(prev => ({ ...prev, clinicPhotos: Array.from(e.target.files || []) }));
+      } else if (field === 'banner') {
+        const file = e.target.files[0];
+        if (file) {
+          if (file.size > 10 * 1024 * 1024) {
+            showToast('Image size should be less than 10MB', 'error');
+            return;
+          }
+          try {
+            const resizedImage = await resizeImage(file, 1920, 1080, 0.9);
+            setImageToCrop(resizedImage);
+            setShowCropModal(true);
+          } catch (error) {
+            showToast('Failed to process image', 'error');
+          }
+        }
       } else {
         setFiles(prev => ({ ...prev, [field]: e.target.files?.[0] || null }));
       }
@@ -238,6 +423,20 @@ export default function CreateDoctorPage() {
       // Validate required fields before submission
       if (!formData.name || !formData.email || !formData.contactNumber) {
         showToast('Please fill all required fields (Name, Email, Contact Number)', 'error');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate contact number - must be exactly 10 digits
+      if (formData.contactNumber && !/^\d{10}$/.test(formData.contactNumber)) {
+        showToast('Please enter a valid 10-digit contact number', 'error');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Validate contact phone if provided - must be exactly 10 digits
+      if (formData.contactPhone && !/^\d{10}$/.test(formData.contactPhone)) {
+        showToast('Please enter a valid 10-digit phone number', 'error');
         setIsSubmitting(false);
         return;
       }
@@ -535,7 +734,7 @@ export default function CreateDoctorPage() {
                       onChange={handleInputChange}
                       maxLength={10}
                       className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
-                      placeholder="10-digit phone number"
+                      placeholder="9876543210"
                     />
                   </div>
                   <div>
@@ -1023,6 +1222,97 @@ export default function CreateDoctorPage() {
               </Button>
             </div>
           </form>
+
+          {showCropModal && imageToCrop && (
+            <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+              <div className="bg-white rounded-lg w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+                <div className="flex items-center justify-between p-4 border-b">
+                  <h3 className="text-lg font-semibold text-gray-900">Crop Image</h3>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowCropModal(false);
+                      setImageToCrop(null);
+                      setCroppedPreview(null);
+                      setCrop({ x: 0, y: 0 });
+                      setZoom(1);
+                    }}
+                    className="text-gray-500 hover:text-gray-700"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="relative w-full h-96 bg-gray-900">
+                  {/* @ts-ignore - react-easy-crop types are incomplete */}
+                  <Cropper
+                    image={imageToCrop}
+                    crop={crop}
+                    zoom={zoom}
+                    aspect={16 / 9}
+                    onCropChange={setCrop}
+                    onZoomChange={setZoom}
+                    onCropComplete={onCropComplete}
+                    cropShape="rect"
+                    showGrid={true}
+                    restrictPosition={true}
+                  />
+                </div>
+                <div className="p-4 border-t">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-4 flex-1">
+                      <label className="text-sm text-gray-700">
+                        Zoom:
+                        <input
+                          type="range"
+                          min={1}
+                          max={3}
+                          step={0.1}
+                          value={zoom}
+                          onChange={(e) => setZoom(Number(e.target.value))}
+                          className="ml-2 w-32"
+                        />
+                      </label>
+                    </div>
+                    {croppedPreview && (
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-600">Preview:</span>
+                        <div className="w-24 h-14 border border-gray-300 rounded overflow-hidden">
+                          <img
+                            src={croppedPreview}
+                            alt="Crop preview"
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex gap-2 justify-end">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => {
+                        setShowCropModal(false);
+                        setImageToCrop(null);
+                        setCroppedPreview(null);
+                        setCrop({ x: 0, y: 0 });
+                        setZoom(1);
+                      }}
+                    >
+                      Cancel
+                    </Button>
+                    <Button
+                      type="button"
+                      onClick={handleCropComplete}
+                      className="bg-[#10b981] hover:bg-[#059669]"
+                      disabled={!croppedAreaPixels}
+                    >
+                      Apply Crop
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </Card>
       </div>
     </div>

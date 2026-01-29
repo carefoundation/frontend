@@ -54,6 +54,12 @@ export default function MyProfilePage() {
   };
 
   const handleSave = async () => {
+    // Validate phone number if provided - must be exactly 10 digits
+    if (formData.phone && !/^\d{10}$/.test(formData.phone.toString().trim())) {
+      showToast('Please enter a valid 10-digit phone number', 'error');
+      return;
+    }
+
     try {
       setSaving(true);
       const userResponse = await api.get<any>('/users/me');
@@ -190,7 +196,14 @@ export default function MyProfilePage() {
                 <input
                   type="tel"
                   value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                    if (value.length <= 10) {
+                      setFormData({ ...formData, phone: value });
+                    }
+                  }}
+                  maxLength={10}
+                  placeholder="9876543210"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
                 />
               ) : (

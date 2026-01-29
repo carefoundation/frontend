@@ -38,16 +38,16 @@ export default function Footer() {
               Care Foundation Trust® is a non-profit organisation committed to compassion and empathy. Our goal is to address critical social issues and uplift lives.
             </p>
             <div className="flex gap-3">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors border border-gray-300 cursor-pointer">
+              <a href="https://www.facebook.com/carefoundationtrustorg/" target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors border border-gray-300 cursor-pointer">
                 <Facebook className="h-5 w-5 text-gray-700" />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors border border-gray-300 cursor-pointer">
+              <a href="https://www.instagram.com/carefoundationtrust/?hl=en" target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors border border-gray-300 cursor-pointer">
                 <Instagram className="h-5 w-5 text-gray-700" />
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors border border-gray-300 cursor-pointer">
+              <a href="https://x.com/carefoundationm" target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors border border-gray-300 cursor-pointer">
                 <Twitter className="h-5 w-5 text-gray-700" />
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors border border-gray-300 cursor-pointer">
+              <a href="https://www.youtube.com/@CareFoundationTrust" target="_blank" rel="noopener noreferrer" className="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition-colors border border-gray-300 cursor-pointer">
                 <Youtube className="h-5 w-5 text-gray-700" />
               </a>
             </div>

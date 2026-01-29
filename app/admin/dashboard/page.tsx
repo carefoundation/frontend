@@ -209,7 +209,7 @@ export default function AdminDashboard() {
       permission: 'manage_partners',
     },
     {
-      title: 'Health Partners',
+      title: 'Doctors for u',
       value: stats.healthPartners.toLocaleString(),
       icon: Stethoscope,
       color: 'text-red-600',

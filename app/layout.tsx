@@ -3,8 +3,7 @@ import { Inter, Roboto_Mono } from "next/font/google";
 import "./globals.css";
 import { generateMetadata as generateSEOMetadata } from "@/lib/seo";
 import dynamic from "next/dynamic";
-import WhatsAppButtonWrapper from "@/components/layout/WhatsAppButtonWrapper";
-import ReduxProvider from "@/components/providers/ReduxProvider";
+import ClientComponentsWrapper from "@/components/layout/ClientComponentsWrapper";
 
 const Header = dynamic(() => import("@/components/layout/Header"), { ssr: true });
 
@@ -42,11 +41,10 @@ export default function RootLayout({
         className={`${inter.variable} ${robotoMono.variable} antialiased`}
         suppressHydrationWarning
       >
-        <ReduxProvider>
+        <ClientComponentsWrapper>
           <Header />
           {children}
-          <WhatsAppButtonWrapper />
-        </ReduxProvider>
+        </ClientComponentsWrapper>
       </body>
     </html>
   );

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
-import { Calendar, MapPin, Clock, Users, ArrowLeft, Loader2, CheckCircle, Share2, Facebook, Twitter, Copy } from 'lucide-react';
+import { Calendar, MapPin, Clock, Users, ArrowLeft, Loader2, CheckCircle, Share2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -179,16 +179,6 @@ export default function EventDetailPage() {
                     {event.category || 'Event'}
                   </span>
                 </div>
-                <div className="absolute top-4 right-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleShare('native')}
-                    className="bg-white/90 hover:bg-white"
-                  >
-                    <Share2 className="h-4 w-4 mr-2" />
-                    Share
-                  </Button>
-                </div>
               </div>
             )}
 
@@ -333,41 +323,6 @@ export default function EventDetailPage() {
               </div>
             </div>
 
-            {/* Share Section */}
-            <div className="border-t border-gray-200 pt-6 mt-6">
-              <p className="text-sm text-gray-600 mb-3 font-medium">Share this event</p>
-              <div className="flex gap-2 flex-wrap">
-                <button
-                  onClick={() => handleShare('facebook')}
-                  className="flex-1 min-w-[120px] py-2 px-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Facebook className="h-4 w-4" />
-                  Facebook
-                </button>
-                <button
-                  onClick={() => handleShare('twitter')}
-                  className="flex-1 min-w-[120px] py-2 px-3 bg-sky-500 text-white rounded-lg hover:bg-sky-600 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Twitter className="h-4 w-4" />
-                  Twitter
-                </button>
-                <button
-                  onClick={() => handleShare('whatsapp')}
-                  className="flex-1 min-w-[120px] py-2 px-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
-                >
-                  <Share2 className="h-4 w-4" />
-                  WhatsApp
-                </button>
-                <button
-                  onClick={() => handleShare('copy')}
-                  className="py-2 px-3 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-                  title="Copy link"
-                >
-                  <Copy className="h-4 w-4 text-gray-700" />
-                </button>
-              </div>
-            </div>
-
             {/* Register Button */}
             <div className="mt-8 pt-6 border-t border-gray-200">
               <Button
@@ -377,6 +332,17 @@ export default function EventDetailPage() {
                 Register for Event
                 <CheckCircle className="ml-2 h-5 w-5" />
               </Button>
+            </div>
+
+            {/* Share Section */}
+            <div className="mt-6 pt-6 border-t border-gray-200">
+              <button
+                onClick={() => handleShare('native')}
+                className="w-full py-2.5 px-4 bg-[#10b981] text-white rounded-lg hover:bg-[#059669] transition-colors flex items-center justify-center gap-2 font-medium"
+              >
+                <Share2 className="h-4 w-4" />
+                Share
+              </button>
             </div>
           </Card>
           </div>

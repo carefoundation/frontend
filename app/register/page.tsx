@@ -75,6 +75,12 @@ export default function RegisterPage() {
       return;
     }
 
+    // Validate phone number - must be exactly 10 digits
+    if (!/^\d{10}$/.test(formData.phone.replace(/\D/g, ''))) {
+      setError('Please enter a valid 10-digit phone number');
+      return;
+    }
+
     if (selectedRole === 'partner') {
       if (documents.length === 0) {
         setError('Please upload required documents for partner registration');
@@ -121,7 +127,7 @@ export default function RegisterPage() {
       const registrationData: any = {
         name: formData.name,
         email: formData.email,
-        mobileNumber: formData.phone,
+        mobileNumber: formData.phone.replace(/\D/g, ''), // Ensure only digits
         password: formData.password,
         confirmPassword: formData.confirmPassword,
         role: selectedRole,
@@ -466,9 +472,15 @@ export default function RegisterPage() {
                       type="tel"
                       required
                       value={formData.phone}
-                      onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                      onChange={(e) => {
+                        const value = e.target.value.replace(/\D/g, ''); // Remove non-digits
+                        if (value.length <= 10) {
+                          setFormData({ ...formData, phone: value });
+                        }
+                      }}
+                      maxLength={10}
                       className="w-full pl-9 pr-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
-                      placeholder="+91 9876543210"
+                      placeholder="9876543210"
                     />
                   </div>
                 </div>

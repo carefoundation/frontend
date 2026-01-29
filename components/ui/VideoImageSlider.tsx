@@ -24,6 +24,7 @@ export default function VideoImageSlider({
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const [videoEnded, setVideoEnded] = useState(false);
   const [playError, setPlayError] = useState(false);
+  const [videoLoadError, setVideoLoadError] = useState(false);
   const [userInteracted, setUserInteracted] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const imageTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -88,13 +89,13 @@ export default function VideoImageSlider({
   // Initialize slider - only run once on mount or when items change
   useEffect(() => {
     // Start with video if available
-    if (firstVideoIndex !== -1) {
+    if (firstVideoIndex !== -1 && !videoLoadError) {
       setCurrentIndex(firstVideoIndex);
       setIsVideoPlaying(true);
       
       // Try to play video after a short delay to ensure it's loaded
       const timeoutId = setTimeout(() => {
-        if (videoRef.current) {
+        if (videoRef.current && !videoLoadError) {
           const playPromise = videoRef.current.play();
           if (playPromise !== undefined) {
             playPromise
@@ -114,11 +115,11 @@ export default function VideoImageSlider({
       
       return () => clearTimeout(timeoutId);
     } else {
-      // If no video, start with first image
+      // If no video or video failed to load, start with first image
       setCurrentIndex(0);
       startImageSlideshow();
     }
-  }, [firstVideoIndex, startImageSlideshow]);
+  }, [firstVideoIndex, startImageSlideshow, videoLoadError]);
 
   // Handle user interaction for video playback
   useEffect(() => {
@@ -128,7 +129,7 @@ export default function VideoImageSlider({
         // Video is already playing
         return;
       }
-      if (videoRef.current && isVideoPlaying && !videoEnded && !playError) {
+      if (videoRef.current && isVideoPlaying && !videoEnded && !playError && !videoLoadError) {
         const playPromise = videoRef.current.play();
         if (playPromise !== undefined) {
           playPromise
@@ -156,16 +157,16 @@ export default function VideoImageSlider({
       document.removeEventListener('touchstart', handleUserInteraction);
       document.removeEventListener('keydown', handleUserInteraction);
     };
-  }, [isVideoPlaying, videoEnded, playError]);
+  }, [isVideoPlaying, videoEnded, playError, videoLoadError]);
 
   // Intersection Observer to play video when in viewport
   useEffect(() => {
-    if (!videoRef.current || !containerRef.current) return;
+    if (!videoRef.current || !containerRef.current || videoLoadError) return;
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          if (entry.isIntersecting && isVideoPlaying && !videoEnded && !playError) {
+          if (entry.isIntersecting && isVideoPlaying && !videoEnded && !playError && !videoLoadError) {
             const playPromise = videoRef.current?.play();
             if (playPromise !== undefined) {
               playPromise
@@ -194,11 +195,11 @@ export default function VideoImageSlider({
     return () => {
       observer.disconnect();
     };
-  }, [isVideoPlaying, videoEnded, playError]);
+  }, [isVideoPlaying, videoEnded, playError, videoLoadError]);
 
   // Try to play video when it becomes ready
   useEffect(() => {
-    if (videoRef.current && isVideoPlaying && !videoEnded && userInteracted) {
+    if (videoRef.current && isVideoPlaying && !videoEnded && userInteracted && !videoLoadError) {
       const playPromise = videoRef.current.play();
       if (playPromise !== undefined) {
         playPromise
@@ -214,7 +215,7 @@ export default function VideoImageSlider({
           });
       }
     }
-  }, [isVideoPlaying, videoEnded, userInteracted]);
+  }, [isVideoPlaying, videoEnded, userInteracted, videoLoadError]);
 
   useEffect(() => {
     // Start slideshow when video ends and we're on an image
@@ -257,11 +258,26 @@ export default function VideoImageSlider({
           <video
             ref={videoRef}
             src={currentItem.src}
-            className="w-full h-full object-contain"
+            className="w-full h-full object-cover"
             onEnded={handleVideoEnd}
+            onError={(e) => {
+              console.error('Video load error:', e);
+              setVideoLoadError(true);
+              setPlayError(true);
+              // If video fails to load, move to first image if available
+              if (imageItems.length > 0) {
+                const firstImageIndex = items.findIndex((item) => item.type === 'image');
+                if (firstImageIndex !== -1) {
+                  setCurrentIndex(firstImageIndex);
+                  setTimeout(() => {
+                    startImageSlideshow();
+                  }, 100);
+                }
+              }
+            }}
             onLoadedData={() => {
               // Try to play when video is loaded
-              if (userInteracted && isVideoPlaying && !videoEnded) {
+              if (userInteracted && isVideoPlaying && !videoEnded && !videoLoadError) {
                 const playPromise = videoRef.current?.play();
                 if (playPromise !== undefined) {
                   playPromise.catch((error) => {
@@ -278,7 +294,7 @@ export default function VideoImageSlider({
             preload="metadata"
             loop={false}
           />
-          {playError && (
+          {playError && !videoLoadError && (
             <div className="absolute inset-0 flex items-center justify-center bg-black/50">
               <button
                 onClick={handlePlayClick}
@@ -293,6 +309,14 @@ export default function VideoImageSlider({
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </button>
+            </div>
+          )}
+          {videoLoadError && (
+            <div className="absolute inset-0 flex items-center justify-center bg-gray-900/80">
+              <div className="text-center text-white p-6">
+                <p className="text-lg font-semibold mb-2">Video unavailable</p>
+                <p className="text-sm text-gray-300">The video file could not be loaded.</p>
+              </div>
             </div>
           )}
         </div>

@@ -54,10 +54,12 @@ export default function DashboardPage() {
       const role = localStorage.getItem('userRole') as typeof userRole | 'admin' || 'donor';
       setUserRole(role as typeof userRole);
 
-      // Check user approval status
+      // Fetch user data first (required for other checks)
+      let userRes: any = null;
       let partnerFormApprovedValue = false;
+      
       try {
-        const userRes = await api.get<any>('/users/me');
+        userRes = await api.get<any>('/users/me');
         if (!userRes) {
           // User not found - clear token and redirect
           if (typeof window !== 'undefined') {
@@ -79,41 +81,8 @@ export default function DashboardPage() {
           setIsApproved(userRes?.isApproved || false);
           setPartnerKycCompleted(userRes?.partnerKycCompleted || false);
           
-          // Check Partner record status
-          try {
-            const partnersRes = await api.get<any[]>('/partners');
-            const myPartnerRecord = Array.isArray(partnersRes) 
-              ? partnersRes.find((p: any) => {
-                  const createdById = typeof p.createdBy === 'string' ? p.createdBy : p.createdBy?._id || p.createdBy?.id;
-                  const userId = userRes?.id || userRes?._id;
-                  return createdById === userId;
-                })
-              : null;
-            
-            if (myPartnerRecord) {
-              partnerFormApprovedValue = myPartnerRecord.status === 'approved' || myPartnerRecord.status === 'active';
-              setPartnerFormApproved(partnerFormApprovedValue);
-            } else {
-              partnerFormApprovedValue = false;
-              setPartnerFormApproved(false);
-            }
-          } catch (error) {
-            // Handle 403 gracefully - user might not have permission to view all partners
-            if (error instanceof ApiError && error.status === 403) {
-              console.warn('Access denied to partners list, checking individual partner record');
-              // Try to find partner record by user ID if possible
-              partnerFormApprovedValue = false;
-              setPartnerFormApproved(false);
-            } else {
-              console.error('Failed to fetch partner record:', error);
-              partnerFormApprovedValue = false;
-              setPartnerFormApproved(false);
-            }
-          }
-          
           // Show KYC modal if approved but KYC not completed
           if (userRes?.isApproved && !userRes?.partnerKycCompleted) {
-            // Check if modal was already dismissed in this session
             const kycModalDismissed = sessionStorage.getItem('kycModalDismissed');
             if (!kycModalDismissed) {
               setShowKycModal(true);
@@ -122,7 +91,6 @@ export default function DashboardPage() {
         }
       } catch (error) {
         console.error('Failed to fetch user data:', error);
-        // If user not found or unauthorized, clear token and redirect to login
         if (error instanceof ApiError && (error.message === 'User not found' || error.status === 401 || error.status === 403)) {
           if (typeof window !== 'undefined') {
             localStorage.removeItem('userToken');
@@ -135,129 +103,122 @@ export default function DashboardPage() {
         }
       }
 
-      // Fetch user donations
-      try {
-        const donationsRes = await api.get<any[]>('/donations');
-        if (Array.isArray(donationsRes)) {
-          const formatted = donationsRes.slice(0, 3).map((donation: any) => ({
-            campaign: donation.campaignId?.title || donation.campaign?.title || 'General Donation',
-            amount: donation.amount || 0,
-            date: donation.createdAt ? new Date(donation.createdAt).toISOString().split('T')[0] : 'N/A',
-            status: donation.status || 'Completed',
-          }));
-          setRecentDonations(formatted);
-        }
-      } catch (error) {
-        // Handle 403 gracefully - user might not have permission
-        if (error instanceof ApiError && error.status === 403) {
-          console.warn('Access denied to donations');
-        } else {
-          console.error('Failed to fetch donations:', error);
-        }
-      }
+      // Prepare parallel API calls based on role
+      const apiCalls: Promise<any>[] = [];
+      const callNames: string[] = [];
 
-      // Fetch user campaigns
-      try {
-        const campaignsRes = await api.get<any[]>('/campaigns/me');
-        if (Array.isArray(campaignsRes)) {
-          const formatted = campaignsRes.slice(0, 3).map((campaign: any) => {
-            const endDate = campaign.endDate ? new Date(campaign.endDate) : null;
-            const daysLeft = endDate ? Math.ceil((endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
-            return {
-              id: campaign._id || campaign.id,
-              title: campaign.title || 'Untitled',
-              currentAmount: campaign.currentAmount || 0,
-              goalAmount: campaign.goalAmount || campaign.goal || 0,
-              donors: campaign.donors || 0,
-              status: campaign.status === 'active' ? 'Active' : campaign.status === 'completed' ? 'Completed' : 'Pending',
-              daysLeft: daysLeft > 0 ? daysLeft : 0,
-            };
-          });
-          setMyCampaigns(formatted);
-        }
-      } catch (error) {
-        // Handle 403 gracefully - user might not have permission
-        if (error instanceof ApiError && error.status === 403) {
-          console.warn('Access denied to campaigns');
-        } else {
-          console.error('Failed to fetch campaigns:', error);
-        }
-      }
+      // Always fetch donations and campaigns in parallel
+      apiCalls.push(
+        api.get<any[]>('/donations?limit=3').catch(() => []),
+        api.get<any[]>('/campaigns/me?limit=3').catch(() => [])
+      );
+      callNames.push('donations', 'campaigns');
 
-      // Fetch wallet data for vendors
-      if (role === 'vendor') {
-        try {
-          const walletRes = await api.get<any>('/wallets/me');
-          if (walletRes) {
-            setWalletData(walletRes);
-          }
-        } catch (error) {
-          // Handle 403 gracefully - user might not have permission or not be a vendor
-          if (error instanceof ApiError && error.status === 403) {
-            console.warn('Access denied to wallet');
-          } else {
-            console.error('Failed to fetch wallet:', error);
-          }
-        }
-      }
-
-      // Fetch coupon stats and available coupons (only if partner form is approved)
+      // Partner-specific calls
       if (role === 'partner') {
-        if (partnerFormApprovedValue) {
-          try {
-            const couponsRes = await api.get<any[]>('/coupons');
-            if (Array.isArray(couponsRes)) {
-              const redeemed = couponsRes.filter(c => c.status === 'redeemed' || c.isRedeemed).length;
-              const active = couponsRes.filter(c => {
-                const expiryDate = c.expiryDate ? new Date(c.expiryDate) : null;
-                return (c.status === 'active' || !c.status) && (!expiryDate || expiryDate > new Date());
-              }).length;
-              setCouponStats({ total: couponsRes.length, redeemed, active });
-              
-              // For partners, get available coupons (not yet assigned)
-              const available = couponsRes.filter(c => {
-                const expiryDate = c.validUntil ? new Date(c.validUntil) : null;
-                return (c.status === 'active' || !c.status) && 
-                       (!expiryDate || expiryDate > new Date()) &&
-                       !c.issuedTo;
-              });
-              setAvailableCoupons(available);
-            }
-          } catch (error) {
-            // Handle 403 gracefully - partner might not have permission yet
-            if (error instanceof ApiError && error.status === 403) {
-              console.warn('Access denied to coupons');
-            } else {
-              console.error('Failed to fetch coupon stats:', error);
-            }
+        apiCalls.push(
+          api.get<any[]>('/partners?limit=50').catch(() => []),
+          api.get<any[]>('/coupons?limit=50').catch(() => []),
+          api.get<any[]>('/coupon-claims/my-claims?limit=50').catch(() => [])
+        );
+        callNames.push('partners', 'coupons', 'claims');
+      }
+
+      // Vendor-specific calls
+      if (role === 'vendor') {
+        apiCalls.push(api.get<any>('/wallets/me').catch(() => null));
+        callNames.push('wallet');
+      }
+
+      // Execute all API calls in parallel
+      const results = await Promise.all(apiCalls);
+      
+      // Process results
+      const resultMap: Record<string, any> = {};
+      callNames.forEach((name, index) => {
+        resultMap[name] = results[index];
+      });
+
+      // Process donations
+      if (resultMap.donations && Array.isArray(resultMap.donations)) {
+        const formatted = resultMap.donations.slice(0, 3).map((donation: any) => ({
+          campaign: donation.campaignId?.title || donation.campaign?.title || 'General Donation',
+          amount: donation.amount || 0,
+          date: donation.createdAt ? new Date(donation.createdAt).toISOString().split('T')[0] : 'N/A',
+          status: donation.status || 'Completed',
+        }));
+        setRecentDonations(formatted);
+      }
+
+      // Process campaigns
+      if (resultMap.campaigns && Array.isArray(resultMap.campaigns)) {
+        const formatted = resultMap.campaigns.slice(0, 3).map((campaign: any) => {
+          const endDate = campaign.endDate ? new Date(campaign.endDate) : null;
+          const daysLeft = endDate ? Math.ceil((endDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : 0;
+          return {
+            id: campaign._id || campaign.id,
+            title: campaign.title || 'Untitled',
+            currentAmount: campaign.currentAmount || 0,
+            goalAmount: campaign.goalAmount || campaign.goal || 0,
+            donors: campaign.donors || 0,
+            status: campaign.status === 'active' ? 'Active' : campaign.status === 'completed' ? 'Completed' : 'Pending',
+            daysLeft: daysLeft > 0 ? daysLeft : 0,
+          };
+        });
+        setMyCampaigns(formatted);
+      }
+
+      // Process partner data
+      if (role === 'partner') {
+        // Check partner record status
+        if (resultMap.partners && Array.isArray(resultMap.partners)) {
+          const myPartnerRecord = resultMap.partners.find((p: any) => {
+            const createdById = typeof p.createdBy === 'string' ? p.createdBy : p.createdBy?._id || p.createdBy?.id;
+            const userId = userRes?.id || userRes?._id;
+            return createdById === userId;
+          });
+          
+          if (myPartnerRecord) {
+            partnerFormApprovedValue = myPartnerRecord.status === 'approved' || myPartnerRecord.status === 'active';
+            setPartnerFormApproved(partnerFormApprovedValue);
+          } else {
+            partnerFormApprovedValue = false;
+            setPartnerFormApproved(false);
           }
+        }
+
+        // Process coupons if partner form is approved
+        if (partnerFormApprovedValue && resultMap.coupons && Array.isArray(resultMap.coupons)) {
+          const redeemed = resultMap.coupons.filter((c: any) => c.status === 'redeemed' || c.isRedeemed).length;
+          const active = resultMap.coupons.filter((c: any) => {
+            const expiryDate = c.expiryDate ? new Date(c.expiryDate) : null;
+            return (c.status === 'active' || !c.status) && (!expiryDate || expiryDate > new Date());
+          }).length;
+          setCouponStats({ total: resultMap.coupons.length, redeemed, active });
+          
+          const available = resultMap.coupons.filter((c: any) => {
+            const expiryDate = c.validUntil ? new Date(c.validUntil) : null;
+            return (c.status === 'active' || !c.status) && 
+                   (!expiryDate || expiryDate > new Date()) &&
+                   !c.issuedTo;
+          });
+          setAvailableCoupons(available);
         } else {
-          // Reset coupon data if partner form is not approved
           setAvailableCoupons([]);
           setCouponStats({ total: 0, redeemed: 0, active: 0 });
         }
-      }
 
-      // Fetch partner claims (only if partner form is approved)
-      if (role === 'partner') {
-        if (partnerFormApprovedValue) {
-          try {
-            const claimsRes = await api.get<any[]>('/coupon-claims/my-claims');
-            if (Array.isArray(claimsRes)) {
-              setMyClaims(claimsRes);
-            }
-          } catch (error) {
-            // Handle 403 gracefully - partner might not have permission yet
-            if (error instanceof ApiError && error.status === 403) {
-              console.warn('Access denied to coupon claims');
-            } else {
-              console.error('Failed to fetch partner claims:', error);
-            }
-          }
+        // Process claims if partner form is approved
+        if (partnerFormApprovedValue && resultMap.claims && Array.isArray(resultMap.claims)) {
+          setMyClaims(resultMap.claims);
         } else {
-          // Reset claims if partner form is not approved
           setMyClaims([]);
         }
+      }
+
+      // Process wallet data for vendors
+      if (role === 'vendor' && resultMap.wallet) {
+        setWalletData(resultMap.wallet);
       }
 
       // Calculate stats based on role
@@ -268,7 +229,6 @@ export default function DashboardPage() {
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.status === 401 || error.message === 'User not found') {
-          // Clear token and redirect to login
           if (typeof window !== 'undefined') {
             localStorage.removeItem('userToken');
             localStorage.removeItem('userEmail');
@@ -278,7 +238,6 @@ export default function DashboardPage() {
           window.location.href = '/login';
           return;
         }
-        // 403 on main user endpoint should also redirect
         if (error.status === 403 && error.message?.includes('authorized')) {
           if (typeof window !== 'undefined') {
             localStorage.removeItem('userToken');
@@ -375,13 +334,14 @@ export default function DashboardPage() {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="p-6 lg:p-8 flex items-center justify-center min-h-[400px]">
-        <Loader2 className="h-8 w-8 animate-spin text-[#10b981]" />
-      </div>
-    );
-  }
+  // Show skeleton loading instead of blocking entire page
+  // if (loading) {
+  //   return (
+  //     <div className="p-6 lg:p-8 flex items-center justify-center min-h-[400px]">
+  //       <Loader2 className="h-8 w-8 animate-spin text-[#10b981]" />
+  //     </div>
+  //   );
+  // }
 
   // Calculate actual stats from live data
   const totalDonated = recentDonations
@@ -434,15 +394,26 @@ export default function DashboardPage() {
         
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {updatedStats.map((stat, index) => (
-          <Card key={index} hover className="p-6">
-            <div className={`${stat.bg} w-12 h-12 rounded-lg flex items-center justify-center mb-4`}>
-              <stat.icon className={`h-6 w-6 ${stat.color}`} />
-            </div>
-            <div className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
-            <div className="text-sm text-gray-600">{stat.label}</div>
-          </Card>
-        ))}
+        {loading && updatedStats.length === 0 ? (
+          // Show skeleton loaders while loading
+          Array.from({ length: 4 }).map((_, index) => (
+            <Card key={index} className="p-6">
+              <div className="bg-gray-200 w-12 h-12 rounded-lg mb-4 animate-pulse" />
+              <div className="h-8 bg-gray-200 rounded mb-2 animate-pulse" />
+              <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse" />
+            </Card>
+          ))
+        ) : (
+          updatedStats.map((stat, index) => (
+            <Card key={index} hover className="p-6">
+              <div className={`${stat.bg} w-12 h-12 rounded-lg flex items-center justify-center mb-4`}>
+                <stat.icon className={`h-6 w-6 ${stat.color}`} />
+              </div>
+              <div className="text-2xl font-bold text-gray-900 mb-1">{stat.value}</div>
+              <div className="text-sm text-gray-600">{stat.label}</div>
+            </Card>
+          ))
+        )}
       </div>
 
       {/* Partner Dashboard - Coupon Claims */}
@@ -638,7 +609,15 @@ export default function DashboardPage() {
                 </Link>
               </div>
               <div className="space-y-4">
-                {recentDonations.map((donation, index) => (
+                {loading && recentDonations.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+                    <p>Loading donations...</p>
+                  </div>
+                ) : recentDonations.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">No donations yet</p>
+                ) : (
+                  recentDonations.map((donation, index) => (
                   <div key={index} className="flex justify-between items-center py-3 border-b border-gray-100 last:border-0">
                     <div>
                       <p className="font-medium text-gray-900">{donation.campaign}</p>
@@ -649,7 +628,8 @@ export default function DashboardPage() {
                       <p className="text-xs text-gray-500">{donation.status}</p>
                     </div>
                   </div>
-                ))}
+                  ))
+                )}
               </div>
             </Card>
             
@@ -665,7 +645,15 @@ export default function DashboardPage() {
                 </Link>
               </div>
               <div className="space-y-4">
-                {myCampaigns.slice(0, 2).map((campaign) => (
+                {loading && myCampaigns.length === 0 ? (
+                  <div className="text-center py-8 text-gray-500">
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto mb-2" />
+                    <p>Loading campaigns...</p>
+                  </div>
+                ) : myCampaigns.length === 0 ? (
+                  <p className="text-gray-500 text-center py-8">No campaigns yet</p>
+                ) : (
+                  myCampaigns.slice(0, 2).map((campaign) => (
                   <div key={campaign.id} className="p-4 bg-gray-50 rounded-lg">
                     <div className="flex justify-between items-start mb-2">
                       <h3 className="font-semibold text-gray-900">{campaign.title}</h3>
@@ -688,7 +676,8 @@ export default function DashboardPage() {
                       <span>{campaign.daysLeft} days left</span>
                     </div>
                   </div>
-                ))}
+                  ))
+                )}
               </div>
               <Link href="/campaigns/new" className="mt-4">
                 <Button variant="outline" className="w-full">

@@ -144,6 +144,13 @@ export default function UsersPage() {
         // Remove status field as it's not a database field
         delete updateData.status;
         
+        // Validate mobile number if provided - must be exactly 10 digits
+        if (updateData.mobileNumber && !/^\d{10}$/.test(updateData.mobileNumber.toString().trim())) {
+          showToast('Please enter a valid 10-digit mobile number', 'error');
+          setUpdating(null);
+          return;
+        }
+        
         await api.put(`/users/${selectedUser._id}`, updateData);
         showToast('User updated successfully!', 'success');
         await fetchUsers();
@@ -305,8 +312,8 @@ export default function UsersPage() {
   return (
     <div className="p-6 lg:p-8">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Registered Users</h1>
-        <p className="text-gray-600">View and manage all registered users</p>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Registered</h1>
+        <p className="text-gray-600">View and manage all registered</p>
       </div>
       <DataTable
         title=""
