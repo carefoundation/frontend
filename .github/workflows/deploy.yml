@@ -27,3 +27,5 @@ jobs:
             rm -rf .next
             npm run build
             pm2 restart care-frontend
+
+
