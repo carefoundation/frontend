@@ -74,7 +74,9 @@ export default function FounderPage() {
               </div>
               <div className="flex items-start gap-4">
                 <div className="bg-[#10b981] p-3 rounded-lg flex-shrink-0">
-                  <Heart className="h-6 w-6 text-white" />
+                  <div className="relative w-10 h-10">
+                    <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+                  </div>
                 </div>
                 <div>
                   <h4 className="font-semibold text-gray-900 mb-1">500+ active volunteers</h4>

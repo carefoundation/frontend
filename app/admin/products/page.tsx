@@ -5,9 +5,11 @@ import DataTable from '@/components/admin/DataTable';
 import Button from '@/components/ui/Button';
 import { Plus, Eye, Edit, Trash2, Package, Loader2 } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { api, ApiError } from '@/lib/api';
 import { showToast } from '@/lib/toast';
 import ConfirmModal from '@/components/ui/ConfirmModal';
+import ViewModal from '@/components/admin/ViewModal';
 
 interface Product {
   _id?: string;
@@ -21,10 +23,13 @@ interface Product {
 }
 
 export default function ProductsPage() {
+  const router = useRouter();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [viewModalOpen, setViewModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [fullProductData, setFullProductData] = useState<any>(null);
   const [updating, setUpdating] = useState<string | null>(null);
 
   useEffect(() => {
@@ -58,6 +63,38 @@ export default function ProductsPage() {
       setProducts([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleView = async (product: Product) => {
+    try {
+      const productId = product._id || product.id;
+      if (!productId) {
+        showToast('Product ID not found', 'error');
+        return;
+      }
+      const data = await api.get<any>(`/products/${productId}`);
+      setFullProductData(data);
+      setSelectedProduct(product);
+      setViewModalOpen(true);
+    } catch (error) {
+      if (error instanceof ApiError) {
+        showToast(error.message, 'error');
+      } else {
+        showToast('Failed to fetch product details', 'error');
+      }
+      // Show with available data if fetch fails
+      setSelectedProduct(product);
+      setViewModalOpen(true);
+    }
+  };
+
+  const handleEdit = (product: Product) => {
+    const id = product._id || product.id;
+    if (id) {
+      router.push(`/admin/products/edit/${id}`);
+    } else {
+      showToast('Product ID not found', 'error');
     }
   };
 
@@ -152,10 +189,22 @@ export default function ProductsPage() {
         data={products}
         actions={(row) => (
           <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-            <Button variant="ghost" size="sm" title="View">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              title="View"
+              onClick={() => handleView(row)}
+              disabled={updating === (row._id || row.id)}
+            >
               <Eye className="h-4 w-4" />
             </Button>
-            <Button variant="ghost" size="sm" title="Edit">
+            <Button 
+              variant="ghost" 
+              size="sm" 
+              title="Edit"
+              onClick={() => handleEdit(row)}
+              disabled={updating === (row._id || row.id)}
+            >
               <Edit className="h-4 w-4" />
             </Button>
             <Button 
@@ -171,6 +220,28 @@ export default function ProductsPage() {
           </div>
         )}
       />
+
+      {/* View Modal */}
+      {fullProductData && (
+        <ViewModal
+          isOpen={viewModalOpen}
+          onClose={() => {
+            setViewModalOpen(false);
+            setSelectedProduct(null);
+            setFullProductData(null);
+          }}
+          title="Product Details"
+          data={{
+            'Name': fullProductData.name || 'N/A',
+            'Category': fullProductData.category || 'N/A',
+            'Price': `₹${(fullProductData.price || 0).toLocaleString()}`,
+            'Stock': fullProductData.stock || fullProductData.quantity || 0,
+            'Status': fullProductData.status || 'N/A',
+            'Description': fullProductData.description || 'N/A',
+            ...(fullProductData.image ? { 'Image': fullProductData.image } : {}),
+          }}
+        />
+      )}
 
       {/* Delete Modal */}
       {selectedProduct && (

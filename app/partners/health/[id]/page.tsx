@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { ArrowLeft, MapPin, Phone, Mail, Clock, Map, Stethoscope, Heart, Loader2, Ticket, X, QrCode, Copy, CheckCircle, Share2, Facebook, Twitter, Linkedin, MessageCircle, User, Award, GraduationCap, Building, DollarSign, Calendar, ExternalLink } from 'lucide-react';
+import { ArrowLeft, MapPin, Phone, Mail, Clock, Map, Stethoscope, Heart, Loader2, Ticket, X, QrCode, Copy, CheckCircle, Share2, Facebook, Twitter, Linkedin, MessageCircle, User, Award, GraduationCap, Building, IndianRupee, Calendar, ExternalLink, Eye } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -158,7 +158,7 @@ export default function HealthPartnerDetailPage() {
 
     switch (platform) {
       case 'whatsapp':
-        window.open(`https://wa.me/?text=${encodeURIComponent(`${title} - ${url}`)}`, '_blank');
+        window.open(`https://wa.me/9136521052?text=${encodeURIComponent(`${title} - ${url}`)}`, '_blank');
         break;
       case 'facebook':
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
@@ -293,7 +293,7 @@ export default function HealthPartnerDetailPage() {
                     {/* Doctor Fees */}
                     {partner.formData.doctorFees && (
                       <div className="flex items-start gap-3">
-                        <DollarSign className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <IndianRupee className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
                         <div>
                           <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Doctor's Actual Fees</div>
                           <div className="text-base font-medium text-gray-900">₹{partner.formData.doctorFees}</div>
@@ -304,7 +304,9 @@ export default function HealthPartnerDetailPage() {
                     {/* Foundation Fees */}
                     {partner.formData.foundationFees && (
                       <div className="flex items-start gap-3">
-                        <Heart className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div className="relative w-6 h-6 flex-shrink-0 mt-0.5">
+                          <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+                        </div>
                         <div>
                           <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Fees For Care Foundation Trust®</div>
                           <div className="text-base font-medium text-gray-900">₹{partner.formData.foundationFees}</div>
@@ -436,25 +438,44 @@ export default function HealthPartnerDetailPage() {
                       </div>
                     </div>
                   )}
+
+                  {/* Clinic Photos Gallery */}
+                  {partner.formData.clinicPhotos && Array.isArray(partner.formData.clinicPhotos) && partner.formData.clinicPhotos.length > 0 && (
+                    <div className="pt-6 border-t-2 border-gray-200">
+                      <h3 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                        <Building className="h-5 w-5 text-[#10b981]" />
+                        Clinic Photos
+                      </h3>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {partner.formData.clinicPhotos.map((photo: string, index: number) => (
+                          <div
+                            key={index}
+                            className="relative aspect-square rounded-lg overflow-hidden cursor-pointer hover:opacity-90 transition-opacity group"
+                            onClick={() => {
+                              // Open image in new tab or lightbox
+                              window.open(photo, '_blank');
+                            }}
+                          >
+                            <Image
+                              src={photo}
+                              alt={`Clinic photo ${index + 1}`}
+                              fill
+                              className="object-cover"
+                              unoptimized
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                              <div className="opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Eye className="h-8 w-8 text-white" />
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
 
-              <div className="pt-6 sm:pt-8 pb-4 sm:pb-6 border-t-2 border-gray-200">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6">
-                  {partner.impact && (
-                    <div className="bg-gray-50 px-4 py-3 rounded-lg">
-                      <span className="text-gray-600 text-base sm:text-lg font-semibold">Impact:</span>
-                      <span className="font-bold text-[#10b981] ml-2 text-lg sm:text-xl">{partner.impact}</span>
-                    </div>
-                  )}
-                  {partner.since && (
-                    <div className="bg-gray-50 px-4 py-3 rounded-lg">
-                      <span className="text-gray-500 text-base sm:text-lg font-semibold">Since </span>
-                      <span className="font-bold text-gray-900 text-lg sm:text-xl">{partner.since}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
             </Card>
           </div>
 
@@ -524,7 +545,9 @@ export default function HealthPartnerDetailPage() {
                     <div className="pb-2 sm:pb-3 border-b border-gray-100">
                       <div className="text-xs font-semibold text-gray-500 mb-1.5 sm:mb-2 uppercase tracking-wide">NGO Fees</div>
                       <div className="flex items-center gap-2 sm:gap-2.5 text-sm text-gray-700">
-                        <Heart className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#10b981] flex-shrink-0" />
+                        <div className="relative w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0">
+                          <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+                        </div>
                         <span className="font-medium">₹{partner.formData?.foundationFees || partner.foundationFees}</span>
                       </div>
                     </div>
@@ -534,8 +557,8 @@ export default function HealthPartnerDetailPage() {
 
               <div className="pt-6 sm:pt-8 border-t-2 border-gray-300">
                 <div className="flex items-center gap-3 mb-5 sm:mb-6">
-                  <div className="bg-[#10b981] p-2 rounded-lg">
-                    <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                  <div className="relative w-8 h-8 sm:w-10 sm:h-10 flex-shrink-0">
+                    <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
                   </div>
                   <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Donate Now</h3>
                 </div>
@@ -604,7 +627,7 @@ export default function HealthPartnerDetailPage() {
                   }}
                   disabled={!selectedAmount && !customAmount}
                 >
-                  <Heart className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                  <Image src="/Logo.png" alt="Logo" width={24} height={24} className="object-contain mr-2" />
                   Donate ₹{customAmount || selectedAmount || '0'}
                 </Button>
 

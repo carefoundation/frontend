@@ -313,7 +313,9 @@ export default function VerifyVolunteerPage() {
 
                   <div>
                     <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                      <Heart className="h-5 w-5 text-[#10b981]" />
+                      <div className="relative w-6 h-6">
+                        <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+                      </div>
                       About Our Organization
                     </h4>
                     <div className="space-y-3 text-sm text-gray-700">

@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowRight, CreditCard, Lock, CheckCircle, ArrowLeft, Shield, Building2, Smartphone, QrCode, RefreshCw, Copy, Download, X } from 'lucide-react';
+import { ArrowRight, Lock, CheckCircle, ArrowLeft, Shield, Building2, Smartphone, QrCode, RefreshCw, Copy, Download, X } from 'lucide-react';
 import Image from 'next/image';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -48,7 +48,7 @@ export default function PaymentPage() {
   const [upiMode, setUpiMode] = useState<'qr' | 'id'>('qr');
   const [paymentTimer, setPaymentTimer] = useState(600); // 10 minutes in seconds
   const [qrCodeUrl, setQrCodeUrl] = useState('');
-  const [paymentGateway, setPaymentGateway] = useState<'demo' | 'razorpay' | 'yesbank'>('razorpay');
+  const [paymentGateway, setPaymentGateway] = useState<'razorpay' | 'yesbank'>('razorpay');
   const [couponCode, setCouponCode] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState<any>(null);
   const [couponError, setCouponError] = useState('');
@@ -353,8 +353,7 @@ export default function PaymentPage() {
       }
 
       // Show success message
-      const gatewayName = paymentGateway === 'demo' ? 'Demo Payment' : 'Yes Bank';
-      showToast(`Payment successful via ${gatewayName}! Thank you for your donation of ₹${donationData?.amount || '0'}`, 'success');
+      showToast(`Payment successful via Yes Bank! Thank you for your donation of ₹${donationData?.amount || '0'}`, 'success');
       
       // If no coupon, redirect immediately
       if (!donationResponse?.coupon) {
@@ -866,25 +865,6 @@ export default function PaymentPage() {
                     <div>
                       <h3 className="font-semibold text-gray-900">Razorpay</h3>
                       <p className="text-sm text-gray-500">Secure payment gateway</p>
-                    </div>
-                  </div>
-                </button>
-
-                {/* Demo Payment Option */}
-                <button
-                  type="button"
-                  onClick={() => setPaymentGateway('demo')}
-                  className={`w-full p-4 rounded-lg border-2 transition-all text-left ${
-                    paymentGateway === 'demo'
-                      ? 'border-[#10b981] bg-[#ecfdf5]'
-                      : 'border-gray-200 bg-white hover:border-gray-300'
-                  }`}
-                >
-                  <div className="flex items-center gap-3">
-                    <CreditCard className={`h-6 w-6 ${paymentGateway === 'demo' ? 'text-[#10b981]' : 'text-gray-400'}`} />
-                    <div>
-                      <h3 className="font-semibold text-gray-900">Demo Payment</h3>
-                      <p className="text-sm text-gray-500">Test payment option</p>
                     </div>
                   </div>
                 </button>

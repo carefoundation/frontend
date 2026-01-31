@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Heart, Users, Target, Award, Calendar, TrendingUp } from 'lucide-react';
+import { Users, Target, Award, Calendar, TrendingUp } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import Card from '@/components/ui/Card';
 
@@ -38,7 +38,13 @@ export default function AboutPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16">
           {stats.map((stat, index) => (
             <Card key={index} hover className="p-6 text-center">
-              <stat.icon className={`h-10 w-10 mx-auto mb-4 ${stat.color}`} />
+              {stat.icon ? (
+                <stat.icon className={`h-10 w-10 mx-auto mb-4 ${stat.color}`} />
+              ) : (
+                <div className="relative w-16 h-16 mx-auto mb-4">
+                  <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+                </div>
+              )}
               <div className="text-3xl font-bold text-gray-900 mb-2">{stat.value}</div>
               <div className="text-sm text-gray-600">{stat.label}</div>
             </Card>
@@ -118,7 +124,9 @@ export default function AboutPage() {
             </div>
             <div className="text-center">
               <div className="bg-[#ecfdf5] p-6 rounded-lg mb-4">
-                <Heart className="h-12 w-12 text-[#10b981] mx-auto" />
+                <div className="relative w-20 h-20 mx-auto">
+                  <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+                </div>
               </div>
               <h3 className="font-semibold text-gray-900 mb-2">Active Volunteers</h3>
               <p className="text-sm text-gray-600">Hundreds of volunteers across India</p>

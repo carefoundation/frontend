@@ -105,7 +105,7 @@ export default function EventDetailPage() {
       window.open(twitterUrl, '_blank', 'width=600,height=400');
     } else if (platform === 'whatsapp') {
       const whatsappText = `Join us at ${event.title} by Care Foundation Trust®!\n\n📅 ${eventDate}${eventTime ? `\n⏰ ${eventTime}` : ''}\n📍 ${event.location}\n\n${eventUrl}`;
-      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
+      const whatsappUrl = `https://wa.me/9136521052?text=${encodeURIComponent(whatsappText)}`;
       window.open(whatsappUrl, '_blank');
     } else if (platform === 'native') {
       if (navigator.share) {

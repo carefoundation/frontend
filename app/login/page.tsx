@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Heart, Mail, Lock, Eye, EyeOff, Shield } from 'lucide-react';
+import Image from 'next/image';
+import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 const Button = dynamic(() => import('@/components/ui/Button'), { ssr: false });
@@ -150,28 +151,14 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-4">
-            <div className="bg-[#10b981] p-2 rounded-lg">
-              <Heart className="h-6 w-6 text-white fill-white" />
+            <div className="relative w-24 h-24">
+              <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
             </div>
-            <span className="text-2xl font-bold text-gray-900">Care</span>
           </Link>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
           <p className="text-gray-600">Login to continue making a difference</p>
         </div>
 
-        {/* Admin Login Info */}
-        <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <div className="flex items-start gap-3">
-            <Shield className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div className="flex-1">
-              <p className="text-sm font-medium text-blue-900 mb-1">Admin Login</p>
-              <p className="text-xs text-blue-700">
-                Use <span className="font-mono font-semibold">admin@care.com</span> / <span className="font-mono font-semibold">admin123</span> to access admin panel
-              </p>
-            </div>
-          </div>
-        </div>
-        
         {/* Login Card */}
         <div className="bg-white rounded-2xl shadow-xl p-8">
           <form onSubmit={handleSubmit} className="space-y-6">

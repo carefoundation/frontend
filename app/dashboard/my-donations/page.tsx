@@ -1,9 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { Heart, Download, Filter, Search, Calendar, Loader2 } from 'lucide-react';
+import { Download, Filter, Search, Calendar, Loader2 } from 'lucide-react';
 import { api, ApiError } from '@/lib/api';
 
 interface Donation {
@@ -95,7 +96,9 @@ export default function MyDonationsPage() {
             <p className="text-sm opacity-90 mt-2">{donations.filter((d) => d.status === 'completed').length} successful donations</p>
           </div>
           <div className="bg-white/20 p-4 rounded-lg">
-            <Heart className="h-12 w-12" />
+            <div className="relative w-20 h-20">
+              <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+            </div>
           </div>
         </div>
       </Card>
@@ -137,7 +140,9 @@ export default function MyDonationsPage() {
       <div className="space-y-4">
         {filteredDonations.length === 0 ? (
           <Card className="p-12 text-center">
-            <Heart className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+            <div className="relative w-24 h-24 mx-auto mb-4">
+              <Image src="/Logo.png" alt="Logo" fill className="object-contain opacity-30" />
+            </div>
             <p className="text-gray-600 text-lg">No donations found</p>
           </Card>
         ) : (

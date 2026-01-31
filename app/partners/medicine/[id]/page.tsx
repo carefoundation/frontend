@@ -195,7 +195,9 @@ export default function MedicinePartnerDetailPage() {
                     {/* Foundation Fees */}
                     {partner.formData.foundationFees && (
                       <div className="flex items-start gap-3">
-                        <Heart className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                        <div className="relative w-6 h-6 flex-shrink-0 mt-0.5">
+                          <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+                        </div>
                         <div>
                           <div className="text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide">Fees For Care Foundation Trust®</div>
                           <div className="text-base font-medium text-gray-900">₹{partner.formData.foundationFees}</div>
@@ -359,22 +361,6 @@ export default function MedicinePartnerDetailPage() {
                 </div>
               )}
 
-              <div className="pt-6 sm:pt-8 pb-4 sm:pb-6 border-t-2 border-gray-200">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6">
-                  {partner.impact && (
-                    <div className="bg-gray-50 px-4 py-3 rounded-lg">
-                      <span className="text-gray-600 text-base sm:text-lg font-semibold">Impact:</span>
-                      <span className="font-bold text-[#10b981] ml-2 text-lg sm:text-xl">{partner.impact}</span>
-                    </div>
-                  )}
-                  {partner.since && (
-                    <div className="bg-gray-50 px-4 py-3 rounded-lg">
-                      <span className="text-gray-500 text-base sm:text-lg font-semibold">Since </span>
-                      <span className="font-bold text-gray-900 text-lg sm:text-xl">{partner.since}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
             </Card>
           </div>
 
@@ -446,7 +432,9 @@ export default function MedicinePartnerDetailPage() {
               <div className="pt-6 sm:pt-8 border-t-2 border-gray-300">
                 <div className="flex items-center gap-3 mb-5 sm:mb-6">
                   <div className="bg-[#10b981] p-2 rounded-lg">
-                    <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                    <div className="relative w-7 h-7 sm:w-8 sm:h-8">
+                      <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+                    </div>
                   </div>
                   <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Donate Now</h3>
                 </div>
@@ -515,7 +503,7 @@ export default function MedicinePartnerDetailPage() {
                   }}
                   disabled={!selectedAmount && !customAmount}
                 >
-                  <Heart className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                  <Image src="/Logo.png" alt="Logo" width={24} height={24} className="object-contain mr-2" />
                   Donate ₹{customAmount || selectedAmount || '0'}
                 </Button>
 

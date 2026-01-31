@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Users, ArrowRight, Heart, Award, Calendar } from 'lucide-react';
+import Image from 'next/image';
+import { Users, ArrowRight, Award, Calendar } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -40,7 +41,9 @@ export default function BecomeVolunteerPage() {
             <div className="grid md:grid-cols-2 gap-6">
               <div className="flex items-start gap-4">
                 <div className="bg-[#10b981] p-3 rounded-lg flex-shrink-0">
-                  <Heart className="h-6 w-6 text-white" />
+                  <div className="relative w-10 h-10">
+                    <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+                  </div>
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900 mb-2">Make a Real Impact</h3>

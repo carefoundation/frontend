@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import { Heart, Menu, X, User, LogIn, LogOut, ChevronDown, Info, Target, Users, Award, FileText, TrendingUp, PlusCircle, FolderOpen, UtensilsCrossed, Stethoscope, Handshake, UserPlus, Calendar, LayoutDashboard, Star, BookOpen, Building2, Pill, Microscope, Mail, Phone } from 'lucide-react';
+import { Heart, Menu, X, User, LogIn, LogOut, ChevronDown, Info, Target, Users, Award, FileText, TrendingUp, PlusCircle, FolderOpen, UtensilsCrossed, Stethoscope, Handshake, UserPlus, Calendar, LayoutDashboard, Star, BookOpen, Building2, Pill, Microscope, Mail, Phone, MapPin } from 'lucide-react';
 import AnimatedHamburger from '../ui/AnimatedHamburger';
 import Button from '../ui/Button';
 import { checkAdminSession, clearAdminSession } from '@/lib/auth';
@@ -178,7 +178,8 @@ export default function Header() {
 
   // Check if we're on admin pages or dashboard
   const isAdminPage = pathname?.startsWith('/admin') || pathname?.startsWith('/dashboard');
-  const shouldHideTopBar = isAdmin || isAdminPage;
+  // Only hide top bar if we're on admin pages (not based on isAdmin login status to avoid hydration issues)
+  const shouldHideTopBar = isAdminPage;
 
   return (
     <>
@@ -186,28 +187,42 @@ export default function Header() {
       {!shouldHideTopBar && (
       <div className="fixed top-0 left-0 right-0 z-[60] bg-[#10b981] text-white text-xs sm:text-sm">
         <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-8 sm:h-10">
-            {/* Left Side - Contact Info */}
-            <div className="flex items-center gap-4 sm:gap-6">
+          <div className="flex items-center justify-between h-auto min-h-[2.5rem] sm:min-h-[2.75rem] py-1.5 sm:py-2">
+            {/* Left Side - Address, Email, Contact */}
+            <div className="flex flex-wrap items-center gap-3 sm:gap-4 lg:gap-6">
               <a 
-                href="mailto:carefoundation.org@gmail.com" 
+                href="https://maps.google.com/?q=1106+Alexander+Tower+Sai+World+Empire+Navi+Mumbai+410210" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-1.5 hover:text-gray-200 transition-colors"
               >
-                <Mail className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                <span className="hidden sm:inline">carefoundation.org@gmail.com</span>
-                <span className="sm:hidden">carefoundation.org@gmail.com</span>
+                <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                <span className="hidden xl:inline">1106, Alexander Tower, Sai World Empire, Navi Mumbai - 410210</span>
+                <span className="hidden md:inline xl:hidden">Navi Mumbai - 410210</span>
+                <span className="md:hidden">Address</span>
               </a>
               <a 
-                href="tel:+919136521052" 
+                href="mailto:carefoundationtrustorg@gmail.com" 
+                className="hidden md:flex items-center gap-1.5 hover:text-gray-200 transition-colors"
+              >
+                <Mail className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                <span className="hidden lg:inline">carefoundationtrustorg@gmail.com</span>
+                <span className="hidden md:inline lg:hidden">Email</span>
+              </a>
+              <a 
+                href="https://wa.me/919136521052" 
+                target="_blank"
+                rel="noopener noreferrer"
                 className="flex items-center gap-1.5 hover:text-gray-200 transition-colors"
               >
-                <Phone className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
-                <span>+91 9136521052</span>
+                <Phone className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                <span className="hidden sm:inline">+91 9136521052</span>
+                <span className="sm:hidden">Call</span>
               </a>
             </div>
 
             {/* Right Side - Social Links */}
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
               <a 
                 href="https://www.facebook.com/carefoundationtrustorg/" 
                 target="_blank" 

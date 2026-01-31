@@ -23,7 +23,7 @@ export default function ViewModal({ isOpen, onClose, title, data }: ViewModalPro
       
       {/* Modal */}
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto overflow-x-hidden">
           {/* Header */}
           <div className="flex justify-between items-center p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
             <h2 className="text-2xl font-bold text-gray-900">{title}</h2>
@@ -36,7 +36,7 @@ export default function ViewModal({ isOpen, onClose, title, data }: ViewModalPro
           </div>
 
           {/* Content */}
-          <div className="p-6">
+          <div className="p-6 overflow-x-hidden">
             <div className="space-y-4">
               {Object.entries(data).map(([key, value]) => {
                 // Handle arrays of images/documents
@@ -63,7 +63,7 @@ export default function ViewModal({ isOpen, onClose, title, data }: ViewModalPro
                               <img 
                                 src={img} 
                                 alt={`${key} ${idx + 1}`}
-                                className="max-w-full h-auto rounded-lg border border-gray-200 max-h-96 object-contain"
+                                className="w-full max-w-full h-auto rounded-lg border border-gray-200 max-h-96 object-contain"
                               />
                               <a 
                                 href={img} 
@@ -91,7 +91,7 @@ export default function ViewModal({ isOpen, onClose, title, data }: ViewModalPro
                                 <>
                                   <iframe
                                     src={doc}
-                                    className="w-full h-96 border border-gray-200 rounded-lg"
+                                    className="w-full max-w-full h-96 border border-gray-200 rounded-lg"
                                     title={`${key} ${idx + 1}`}
                                   />
                                   <a 
@@ -142,7 +142,7 @@ export default function ViewModal({ isOpen, onClose, title, data }: ViewModalPro
                                     <img 
                                       src={fileData} 
                                       alt={fileName || `Document ${idx + 1}`}
-                                      className="max-w-full h-auto rounded-lg border border-gray-200 max-h-96 object-contain"
+                                      className="w-full max-w-full h-auto rounded-lg border border-gray-200 max-h-96 object-contain"
                                     />
                                     <a 
                                       href={fileData} 
@@ -158,11 +158,11 @@ export default function ViewModal({ isOpen, onClose, title, data }: ViewModalPro
                                     {fileName && (
                                       <p className="text-sm font-medium text-gray-900 mb-2">{fileName}</p>
                                     )}
-                                    <iframe
-                                      src={fileData}
-                                      className="w-full h-96 border border-gray-200 rounded-lg"
-                                      title={fileName || `Document ${idx + 1}`}
-                                    />
+                          <iframe
+                            src={fileData}
+                            className="w-full max-w-full h-96 border border-gray-200 rounded-lg"
+                            title={fileName || `Document ${idx + 1}`}
+                          />
                                     <a 
                                       href={fileData} 
                                       target="_blank" 
@@ -221,7 +221,7 @@ export default function ViewModal({ isOpen, onClose, title, data }: ViewModalPro
                           <img 
                             src={displayValue} 
                             alt={fileName || key}
-                            className="max-w-full h-auto rounded-lg border border-gray-200 max-h-96 object-contain"
+                            className="w-full max-w-full h-auto rounded-lg border border-gray-200 max-h-96 object-contain"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                               const nextSibling = e.currentTarget.nextElementSibling as HTMLElement;
@@ -249,7 +249,7 @@ export default function ViewModal({ isOpen, onClose, title, data }: ViewModalPro
                           )}
                           <iframe
                             src={displayValue}
-                            className="w-full h-96 border border-gray-200 rounded-lg"
+                            className="w-full max-w-full h-96 border border-gray-200 rounded-lg"
                             title={fileName || key}
                           />
                           <a 
@@ -293,7 +293,7 @@ export default function ViewModal({ isOpen, onClose, title, data }: ViewModalPro
                             })}
                           </div>
                         ) : (
-                          <pre className="bg-gray-50 p-3 rounded text-sm overflow-x-auto whitespace-pre-wrap font-mono text-gray-700 border border-gray-200">
+                          <pre className="bg-gray-50 p-3 rounded text-sm overflow-x-hidden whitespace-pre-wrap font-mono text-gray-700 border border-gray-200 break-words">
                             {JSON.stringify(value, null, 2)}
                           </pre>
                         )

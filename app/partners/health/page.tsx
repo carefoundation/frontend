@@ -193,7 +193,7 @@ export default function HealthPartnersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16">
+    <div className="min-h-screen bg-[#ecfdf5] pt-16">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-16">
         {/* Page Header */}
         <div className="text-center mb-16">
@@ -212,7 +212,9 @@ export default function HealthPartnersPage() {
             <div className="text-green-100">Health Partners</div>
           </Card>
           <Card className="p-6 text-center bg-gradient-to-br from-[#10b981] to-[#059669] text-white">
-            <Heart className="h-10 w-10 mx-auto mb-4" />
+            <div className="relative w-16 h-16 mx-auto mb-4">
+              <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+            </div>
             <div className="text-3xl font-bold mb-2">
               {stats.patientsServed >= 1000000 
                 ? `${(stats.patientsServed / 1000000).toFixed(0)}M+`
@@ -238,19 +240,20 @@ export default function HealthPartnersPage() {
             <Card 
               key={partner.id} 
               hover 
-              className="overflow-hidden cursor-pointer"
+              className="overflow-hidden cursor-pointer shadow-lg hover:shadow-xl transition-all duration-300 border border-gray-100"
               onClick={() => router.push(`/partners/health/${partner.id}`)}
             >
-              <div className="relative h-64 bg-gradient-to-br from-[#ecfdf5] to-white">
+              <div className="relative h-72 bg-gradient-to-br from-[#ecfdf5] to-white overflow-hidden">
                 <Image
                   src={partner.photo || partner.logo}
                   alt={partner.name}
                   fill
-                  className="object-cover"
+                  className="object-cover transition-transform duration-300 hover:scale-105"
                   unoptimized
                 />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
                 <div className="absolute top-4 left-4">
-                  <div className="bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-lg shadow-md">
+                  <div className="bg-white/95 backdrop-blur-sm px-3 py-2 rounded-lg shadow-lg border border-gray-100">
                     <Image
                       src={partner.logo}
                       alt={`${partner.name} logo`}
@@ -262,55 +265,45 @@ export default function HealthPartnersPage() {
                   </div>
                 </div>
               </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-gray-900 mb-2">{partner.name}</h3>
-                <p className="text-gray-600 text-sm mb-4 leading-relaxed line-clamp-4">{partner.description}</p>
+              <div className="p-6 bg-white">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2 leading-tight">{partner.name}</h3>
+                <p className="text-gray-600 text-sm mb-5 leading-relaxed line-clamp-3 min-h-[3.75rem]">{partner.description}</p>
                 
-                <div className="mb-4">
-                  <h4 className="text-sm font-semibold text-gray-900 mb-2">Programs:</h4>
+                <div className="mb-5">
+                  <h4 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">Programs</h4>
                   <div className="flex flex-wrap gap-2">
                     {Array.isArray(partner.programs) && partner.programs.slice(0, 4).map((program: any, index: number) => (
                       <span
                         key={index}
-                        className="px-2 py-1 bg-[#ecfdf5] text-[#10b981] text-xs font-medium rounded"
+                        className="px-3 py-1.5 bg-[#ecfdf5] text-[#10b981] text-xs font-semibold rounded-md border border-[#10b981]/20"
                       >
                         {typeof program === 'string' ? program : (program?.name || program?.title || 'Program')}
                       </span>
                     ))}
                     {Array.isArray(partner.programs) && partner.programs.length > 4 && (
-                      <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded">
-                        +{partner.programs.length - 4} more...
+                      <span className="px-3 py-1.5 bg-gray-100 text-gray-600 text-xs font-semibold rounded-md border border-gray-200">
+                        +{partner.programs.length - 4} more
                       </span>
                     )}
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-gray-200">
-                  <div className="flex justify-between items-center text-sm">
-                    <div>
-                      <span className="text-gray-600">Impact:</span>
-                      <span className="font-semibold text-gray-900 ml-1">{partner.impact}</span>
-                    </div>
-                    <div className="text-gray-500">Since {partner.since}</div>
-                  </div>
-                </div>
-
                 {/* Action Buttons */}
-                <div className="mt-4 grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
+                <div className="mt-6 pt-4 border-t border-gray-100 grid grid-cols-2 gap-3" onClick={(e) => e.stopPropagation()}>
                   <Button 
                     variant="outline" 
                     size="sm" 
-                    className="w-full"
+                    className="w-full border-2 border-[#10b981] text-[#10b981] hover:bg-[#10b981] hover:text-white font-semibold transition-all duration-200"
                     onClick={(e) => {
                       e.stopPropagation();
                       router.push(`/partners/health/${partner.id}`);
                     }}
                   >
-                    <Map className="h-4 w-4 mr-1" />
+                    <Stethoscope className="h-4 w-4 mr-1.5" />
                     Consult Now
                   </Button>
                   <button
-                    className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-sm py-2 px-3 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg"
+                    className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-sm py-2.5 px-4 rounded-lg flex items-center justify-center gap-2 transition-all duration-200 shadow-md hover:shadow-lg transform hover:scale-[1.02]"
                     onClick={(e) => {
                       e.stopPropagation();
                       if (navigator.share) {

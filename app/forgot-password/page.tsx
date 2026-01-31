@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Heart, Mail, ArrowLeft, CheckCircle } from 'lucide-react';
+import Image from 'next/image';
+import { Mail, ArrowLeft, CheckCircle } from 'lucide-react';
 import Button from '@/components/ui/Button';
 
 export default function ForgotPasswordPage() {
@@ -36,7 +37,9 @@ export default function ForgotPasswordPage() {
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-4">
             <div className="bg-[#10b981] p-2 rounded-lg">
-              <Heart className="h-6 w-6 text-white fill-white" />
+              <div className="relative w-10 h-10">
+                <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+              </div>
             </div>
             <span className="text-2xl font-bold text-gray-900">Care</span>
           </Link>

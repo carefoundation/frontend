@@ -203,7 +203,7 @@ export default function EventsPage() {
       showToast('Event details copied! Paste on Instagram', 'info');
     } else if (platform === 'whatsapp') {
       const whatsappText = `Join us at ${event.title} by Care Foundation Trust®!\n\n📅 ${eventDate}${event.time ? `\n⏰ ${event.time}` : ''}\n📍 ${event.location}\n\n${eventUrl}`;
-      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(whatsappText)}`;
+      const whatsappUrl = `https://wa.me/9136521052?text=${encodeURIComponent(whatsappText)}`;
       window.open(whatsappUrl, '_blank');
     } else if (platform === 'native') {
       if (navigator.share) {

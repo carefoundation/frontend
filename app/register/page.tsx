@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Heart, Mail, Lock, Eye, EyeOff, User, Phone, FileText, Upload, X, CheckCircle, Shield, Award, TrendingUp, Users, Target } from 'lucide-react';
+import Image from 'next/image';
+import { Mail, Lock, Eye, EyeOff, User, Phone, FileText, Upload, X, CheckCircle, Shield, Award, TrendingUp, Users, Target, Heart } from 'lucide-react';
 import Button from '@/components/ui/Button';
 import { showToast } from '@/lib/toast';
 import { ApiError } from '@/lib/api';
@@ -244,8 +245,8 @@ export default function RegisterPage() {
             <div className="sticky top-6 max-w-lg">
               {/* Logo */}
               <Link href="/" className="inline-flex items-center gap-2 mb-6">
-                <div className="bg-[#10b981] p-2 rounded-lg">
-                  <Heart className="h-6 w-6 text-white fill-white" />
+                <div className="relative w-10 h-10">
+                  <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
                 </div>
                 <span className="text-2xl font-bold text-gray-900">Care Foundation</span>
               </Link>
@@ -354,8 +355,8 @@ export default function RegisterPage() {
             {/* Mobile Logo */}
             <div className="text-center mb-4 lg:hidden">
               <Link href="/" className="inline-flex items-center gap-2 mb-2">
-                <div className="bg-[#10b981] p-2 rounded-lg">
-                  <Heart className="h-5 w-5 text-white fill-white" />
+                <div className="relative w-8 h-8">
+                  <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
                 </div>
                 <span className="text-xl font-bold text-gray-900">Care</span>
               </Link>

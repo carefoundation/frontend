@@ -1,13 +1,14 @@
 'use client';
 
-import { Heart, Target, Users, Award, Eye, HandHeart } from 'lucide-react';
+import Image from 'next/image';
+import { Target, Users, Award, Eye, HandHeart } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import Card from '@/components/ui/Card';
 
 export default function MissionPage() {
   const values = [
     {
-      icon: Heart,
+      icon: null as any,
       title: 'Compassion',
       description: 'We believe in showing genuine care and empathy towards those in need, treating every individual with dignity and respect.',
     },
@@ -53,7 +54,9 @@ export default function MissionPage() {
         {/* Mission Statement */}
         <Card className="p-8 mb-12 bg-gradient-to-br from-[#ecfdf5] to-white">
           <div className="max-w-4xl mx-auto text-center">
-            <Heart className="h-16 w-16 text-[#10b981] mx-auto mb-6" />
+            <div className="relative w-24 h-24 mx-auto mb-6">
+              <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+            </div>
             <h2 className="text-3xl font-bold text-gray-900 mb-6">Our Mission Statement</h2>
             <p className="text-lg text-gray-700 leading-relaxed mb-4">
               Care Foundation Trust® is committed to addressing critical social issues and uplifting lives through 
@@ -94,7 +97,13 @@ export default function MissionPage() {
             {values.map((value, index) => (
               <Card key={index} hover className="p-6 text-center">
                 <div className="bg-[#10b981] p-4 rounded-full w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-                  <value.icon className="h-8 w-8 text-white" />
+                  {value.icon ? (
+                    <value.icon className="h-8 w-8 text-white" />
+                  ) : (
+                    <div className="relative w-10 h-10">
+                      <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+                    </div>
+                  )}
                 </div>
                 <h3 className="text-xl font-semibold text-gray-900 mb-3">{value.title}</h3>
                 <p className="text-gray-600 text-sm leading-relaxed">{value.description}</p>

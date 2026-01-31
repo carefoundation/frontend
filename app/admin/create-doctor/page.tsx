@@ -92,6 +92,7 @@ export default function CreateDoctorPage() {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<any>(null);
   const [croppedPreview, setCroppedPreview] = useState<string | null>(null);
+  const [bannerPreview, setBannerPreview] = useState<string | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -242,6 +243,7 @@ export default function CreateDoctorPage() {
       const file = new File([blob], 'banner.jpg', { type: 'image/jpeg' });
       
       setFiles(prev => ({ ...prev, banner: file }));
+      setBannerPreview(croppedImageDataUrl); // Set preview URL
       setShowCropModal(false);
       setImageToCrop(null);
       setCroppedPreview(null);
@@ -387,8 +389,8 @@ export default function CreateDoctorPage() {
         name: formData.name,
         type: 'health',
         description: `Doctor - ${formData.specialization || 'General Practitioner'}. ${formData.qualification || ''}. Registration: ${formData.registrationNo || 'N/A'}`,
-        email: formData.email,
-        phone: formData.contactNumber,
+        email: '',
+        phone: '',
         address: formData.streetAddress,
         city: formData.city,
         state: formData.state,
@@ -421,15 +423,8 @@ export default function CreateDoctorPage() {
       };
 
       // Validate required fields before submission
-      if (!formData.name || !formData.email || !formData.contactNumber) {
-        showToast('Please fill all required fields (Name, Email, Contact Number)', 'error');
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Validate contact number - must be exactly 10 digits
-      if (formData.contactNumber && !/^\d{10}$/.test(formData.contactNumber)) {
-        showToast('Please enter a valid 10-digit contact number', 'error');
+      if (!formData.name) {
+        showToast('Please fill all required fields (Name)', 'error');
         setIsSubmitting(false);
         return;
       }
@@ -530,6 +525,15 @@ export default function CreateDoctorPage() {
                   {files.banner ? files.banner.name : 'No file chosen'}
                 </span>
               </div>
+              {bannerPreview && (
+                <div className="mt-4">
+                  <img 
+                    src={bannerPreview} 
+                    alt="Banner Preview" 
+                    className="w-full max-w-2xl h-auto rounded-lg border border-gray-300 object-contain"
+                  />
+                </div>
+              )}
               <div className="flex items-start gap-2 mt-2 text-sm text-[#10b981]">
                 <AlertTriangle className="h-4 w-4 mt-0.5 flex-shrink-0" />
                 <span>Select an image to open the crop tool (16:9 aspect ratio)</span>
@@ -754,36 +758,6 @@ export default function CreateDoctorPage() {
               </div>
             </div>
 
-            {/* Email and Contact Number */}
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2 uppercase">
-                  Email ID
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
-                  placeholder="Enter Email here"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-bold text-gray-900 mb-2 uppercase">
-                  Contact Number
-                </label>
-                <input
-                  type="tel"
-                  name="contactNumber"
-                  value={formData.contactNumber}
-                  onChange={handleInputChange}
-                  maxLength={10}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#10b981] focus:border-transparent"
-                  placeholder="Enter 10 digit mobile number (e.g., 9876543210)"
-                />
-              </div>
-            </div>
 
             {/* Doctor's Actual Fees */}
             <div>

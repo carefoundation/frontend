@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { Heart, TrendingUp, Users, Target, Plus, Eye, Edit, Trash2, ArrowRight, Wallet, Award, Download, Ticket, Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import { TrendingUp, Users, Target, Plus, Eye, Edit, Trash2, ArrowRight, Wallet, Award, Download, Ticket, Loader2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
@@ -530,7 +531,7 @@ export default function DashboardPage() {
           <div className="grid md:grid-cols-3 gap-4">
             <Link href="/campaigns">
               <Button className="w-full">
-                <Heart className="h-4 w-4 mr-2" />
+                <Image src="/Logo.png" alt="Logo" width={20} height={20} className="object-contain mr-2" />
                 Donate Now
               </Button>
             </Link>

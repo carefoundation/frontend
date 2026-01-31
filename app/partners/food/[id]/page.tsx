@@ -152,7 +152,7 @@ export default function FoodPartnerDetailPage() {
 
     switch (platform) {
       case 'whatsapp':
-        window.open(`https://wa.me/?text=${encodeURIComponent(`${title} - ${url}`)}`, '_blank');
+        window.open(`https://wa.me/9136521052?text=${encodeURIComponent(`${title} - ${url}`)}`, '_blank');
         break;
       case 'facebook':
         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
@@ -434,22 +434,6 @@ export default function FoodPartnerDetailPage() {
                 </div>
               )}
 
-              <div className="pt-6 sm:pt-8 pb-4 sm:pb-6 border-t-2 border-gray-200">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-6">
-                  {partner.impact && (
-                    <div className="bg-gray-50 px-4 py-3 rounded-lg">
-                      <span className="text-gray-600 text-base sm:text-lg font-semibold">Impact:</span>
-                      <span className="font-bold text-[#10b981] ml-2 text-lg sm:text-xl">{partner.impact}</span>
-                    </div>
-                  )}
-                  {partner.since && (
-                    <div className="bg-gray-50 px-4 py-3 rounded-lg">
-                      <span className="text-gray-500 text-base sm:text-lg font-semibold">Since </span>
-                      <span className="font-bold text-gray-900 text-lg sm:text-xl">{partner.since}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
             </Card>
 
             {/* CFT Menu Section */}
@@ -565,7 +549,9 @@ export default function FoodPartnerDetailPage() {
                     <div className="pb-2 sm:pb-3 border-b border-gray-100">
                       <div className="text-xs font-semibold text-gray-500 mb-1.5 sm:mb-2 uppercase tracking-wide">NGO Fees</div>
                       <div className="flex items-center gap-2 sm:gap-2.5 text-sm text-gray-700">
-                        <Heart className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-[#10b981] flex-shrink-0" />
+                        <div className="relative w-5 h-5 sm:w-6 sm:h-6 flex-shrink-0">
+                          <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+                        </div>
                         <span className="font-medium">₹{partner.formData?.foundationFees || partner.foundationFees}</span>
                       </div>
                     </div>
@@ -577,7 +563,9 @@ export default function FoodPartnerDetailPage() {
               <div className="pt-6 sm:pt-8 border-t-2 border-gray-300">
                 <div className="flex items-center gap-3 mb-5 sm:mb-6">
                   <div className="bg-[#10b981] p-2 rounded-lg">
-                    <Heart className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+                    <div className="relative w-7 h-7 sm:w-8 sm:h-8">
+                      <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+                    </div>
                   </div>
                   <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Donate Now</h3>
                 </div>
@@ -650,7 +638,7 @@ export default function FoodPartnerDetailPage() {
                   }}
                   disabled={!selectedAmount && !customAmount}
                 >
-                  <Heart className="h-4 w-4 sm:h-5 sm:w-5 mr-2" />
+                  <Image src="/Logo.png" alt="Logo" width={24} height={24} className="object-contain mr-2" />
                   Donate ₹{customAmount || selectedAmount || '0'}
                 </Button>
 

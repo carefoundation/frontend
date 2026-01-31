@@ -295,7 +295,7 @@ export default function CampaignDetailPage() {
                 className="w-full mb-4"
                 size="lg"
               >
-                <Heart className="mr-2 h-5 w-5" />
+                <Image src="/Logo.png" alt="Logo" width={24} height={24} className="object-contain mr-2" />
                 Donate Now
               </Button>
               

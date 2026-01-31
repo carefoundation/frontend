@@ -75,7 +75,9 @@ export default function HappyClientsPage() {
       <div className="w-full px-4 sm:px-6 lg:px-8 py-16">
         {/* Page Header */}
         <div className="text-center mb-16">
-          <Heart className="h-16 w-16 text-[#10b981] mx-auto mb-6" />
+          <div className="relative w-24 h-24 mx-auto mb-6">
+            <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+          </div>
           <h1 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">Happy Clients</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Read what our donors, beneficiaries, and partners have to say about their experience with Care Foundation Trust®.

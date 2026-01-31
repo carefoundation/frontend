@@ -234,7 +234,11 @@ export default function FormSubmissionsPage() {
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => handleView(row)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleView(row);
+              }}
               title="View Details"
               disabled={updating === (row._id || row.id)}
             >
@@ -247,7 +251,11 @@ export default function FormSubmissionsPage() {
                 <Button
                   size="sm"
                   className="bg-[#10b981] hover:bg-[#059669]"
-                  onClick={() => handleApprove(row._id || row.id || '')}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleApprove(row._id || row.id || '');
+                  }}
                 >
                   <CheckCircle2 className="h-4 w-4 mr-1" />
                   Approve
@@ -255,13 +263,35 @@ export default function FormSubmissionsPage() {
                 <Button
                   variant="danger"
                   size="sm"
-                  onClick={() => handleRejectClick(row)}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    handleRejectClick(row);
+                  }}
                 >
                   <XCircle className="h-4 w-4 mr-1" />
                   Reject
                 </Button>
               </>
             )}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleDeleteClick(row);
+              }}
+              disabled={updating === (row._id || row.id)}
+              title="Delete"
+            >
+              {updating === (row._id || row.id) ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
+            </Button>
           </div>
         )}
       />

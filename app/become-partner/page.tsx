@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Handshake, ArrowRight, ChevronDown, Building2, CheckCircle, Mail, Phone, MapPin, Stethoscope, UtensilsCrossed, Pill, FlaskConical, Calendar, Heart, X, Upload, Loader2 } from 'lucide-react';
+import Image from 'next/image';
+import { Handshake, ArrowRight, ChevronDown, Building2, CheckCircle, Mail, Phone, MapPin, Stethoscope, UtensilsCrossed, Pill, FlaskConical, Calendar, X, Upload, Loader2 } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
@@ -218,18 +219,6 @@ export default function BecomePartnerPage() {
     }
   };
 
-  const [formData, setFormData] = useState({
-    partnerFor: '',
-    name: '',
-    contactNumber: '',
-    email: '',
-    addressOfOperation: '',
-    message: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  
   // Fundraiser Form Modal State
   const [fundraiserModalOpen, setFundraiserModalOpen] = useState(false);
   const [fundraiserFormData, setFundraiserFormData] = useState({
@@ -240,71 +229,6 @@ export default function BecomePartnerPage() {
     image: null as File | null,
   });
   const [isSubmittingFundraiser, setIsSubmittingFundraiser] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError(null);
-    setSuccess(false);
-    
-    try {
-      // Validate required fields
-      if (!formData.name || !formData.name.trim()) {
-        setError('Please provide your name');
-        setIsSubmitting(false);
-        return;
-      }
-
-      if (!formData.partnerFor) {
-        setError('Please select a partner type');
-        setIsSubmitting(false);
-        return;
-      }
-
-      // Convert partner type to lowercase to match backend enum
-      const partnerType = formData.partnerFor.toLowerCase();
-      
-      if (!['health', 'food'].includes(partnerType)) {
-        setError('Please select a valid partner type (Health or Food)');
-        setIsSubmitting(false);
-        return;
-      }
-      
-      await api.post('/partners', {
-        type: partnerType,
-        name: formData.name.trim(),
-        description: formData.message?.trim() || `Partner application for ${formData.name.trim()}`,
-        phone: formData.contactNumber || null,
-        email: formData.email || null,
-        address: formData.addressOfOperation || null,
-      });
-      setSuccess(true);
-      setFormData({
-        partnerFor: '',
-        name: '',
-        contactNumber: '',
-        email: '',
-        addressOfOperation: '',
-        message: '',
-      });
-      setTimeout(() => setSuccess(false), 5000);
-    } catch (err) {
-      if (err instanceof ApiError) {
-        setError(err.message);
-      } else {
-        setError('Failed to submit partner application. Please try again.');
-      }
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
 
   const benefits = [
     {
@@ -345,142 +269,45 @@ export default function BecomePartnerPage() {
           </div>
 
           <div className="grid lg:grid-cols-2 gap-8">
-            {/* Partnership Form */}
+            {/* Care Foundation Information */}
             <Card className="p-8">
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Partner For Dropdown */}
-              <div>
-                <label htmlFor="partnerFor" className="block text-sm font-medium text-gray-700 mb-2">
-                  Partner For
-                </label>
-                <div className="relative">
-                  <select
-                    id="partnerFor"
-                    name="partnerFor"
-                    value={formData.partnerFor}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-4 py-2.5 pr-10 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent appearance-none bg-white text-gray-900"
-                    suppressHydrationWarning
-                  >
-                    <option value="">Select partner type</option>
-                    <option value="food">Food Partner</option>
-                    <option value="health">Health Partner</option>
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-4">About Care Foundation Trust®</h2>
+                  <p className="text-gray-700 leading-relaxed mb-4">
+                    Care Foundation Trust® is a non-profit organisation committed to compassion and empathy. Established in 1997, we have been dedicated to making a meaningful difference in the lives of those in need through transparent donations, volunteer support, and meaningful partnerships.
+                  </p>
+                  <p className="text-gray-700 leading-relaxed">
+                    Our goal is to address critical social issues and uplift lives through various initiatives including healthcare services, food distribution, education support, and community development programs.
+                  </p>
+                </div>
+
+                <div className="bg-[#ecfdf5] rounded-lg p-6">
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Our Mission</h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    To create a positive impact in society by providing essential services, supporting those in need, and building a network of compassionate partners who share our vision of a better world.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">Our Values</h3>
+                  <ul className="space-y-3 text-gray-700">
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                      <span>Transparency and accountability in all operations</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                      <span>Commitment to social welfare</span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <CheckCircle className="h-5 w-5 text-[#10b981] flex-shrink-0 mt-0.5" />
+                      <span>Building strong community partnerships</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
-
-              {/* Your Name */}
-              <div>
-                <input
-                  type="text"
-                  id="name"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent bg-white text-gray-900 placeholder-gray-400"
-                  placeholder="Your Name"
-                  suppressHydrationWarning
-                />
-              </div>
-
-              {/* Contact Number */}
-              <div>
-                <input
-                  type="tel"
-                  id="contactNumber"
-                  name="contactNumber"
-                  value={formData.contactNumber}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent bg-white text-gray-900 placeholder-gray-400"
-                  placeholder="Contact Number"
-                  suppressHydrationWarning
-                />
-              </div>
-
-              {/* Email ID */}
-              <div>
-                <input
-                  type="email"
-                  id="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent bg-white text-gray-900 placeholder-gray-400"
-                  placeholder="Email ID"
-                  suppressHydrationWarning
-                />
-              </div>
-
-              {/* Address Of Operation */}
-              <div>
-                <textarea
-                  id="addressOfOperation"
-                  name="addressOfOperation"
-                  value={formData.addressOfOperation}
-                  onChange={handleChange}
-                  required
-                  rows={4}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent bg-white text-gray-900 placeholder-gray-400 resize-none"
-                  placeholder="Address Of Operation"
-                  suppressHydrationWarning
-                />
-              </div>
-
-              {/* Your Message */}
-              <div>
-                <textarea
-                  id="message"
-                  name="message"
-                  value={formData.message}
-                  onChange={handleChange}
-                  rows={4}
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#10b981] focus:border-transparent bg-white text-gray-900 placeholder-gray-400 resize-none"
-                  placeholder="Your Message"
-                  suppressHydrationWarning
-                />
-              </div>
-
-              {/* Request Now Button */}
-              {error && (
-                <div className="p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
-                  {error}
-                </div>
-              )}
-              {success && (
-                <div className="p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm">
-                  Thank you for your interest in becoming a partner! We will contact you within 48 hours.
-                </div>
-              )}
-              <Button
-                type="submit"
-                size="lg"
-                className="w-full bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={isSubmitting || !isLoggedIn}
-                onClick={!isLoggedIn ? (e) => {
-                  e.preventDefault();
-                  showToast('Please login to submit partner application', 'error');
-                  router.push('/login');
-                } : undefined}
-              >
-                {isSubmitting ? 'Submitting...' : !isLoggedIn ? (
-                  <>
-                    Login Required
-                    <ArrowRight className="ml-2 h-5 w-5 inline" />
-                  </>
-                ) : (
-                  <>
-                    Request Now
-                    <ArrowRight className="ml-2 h-5 w-5 inline" />
-                  </>
-                )}
-              </Button>
-            </form>
-          </Card>
+            </Card>
 
             {/* Benefits & Info */}
             <div className="space-y-6">
@@ -728,8 +555,8 @@ export default function BecomePartnerPage() {
               {/* Fundraiser Form Card */}
               <Card className={`p-6 transition-all duration-300 group ${isLoggedIn ? 'hover:shadow-lg cursor-pointer' : 'opacity-75 cursor-not-allowed'}`} onClick={isLoggedIn ? openFundraiserModal : undefined}>
                 <div className="flex flex-col items-center text-center">
-                  <div className={`w-16 h-16 bg-[#10b981] rounded-full flex items-center justify-center mb-4 transition-transform ${isLoggedIn ? 'group-hover:scale-110' : ''}`}>
-                    <Heart className="h-8 w-8 text-white" />
+                  <div className={`relative w-16 h-16 mb-4 transition-transform ${isLoggedIn ? 'group-hover:scale-110' : ''}`}>
+                    <Image src="/Logo.png" alt="Care Foundation Trust Logo" fill className="object-contain opacity-90" />
                   </div>
                   <h3 className="text-xl font-bold text-gray-900 mb-2">Fundraiser</h3>
                   <p className="text-gray-600 text-sm mb-4">

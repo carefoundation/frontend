@@ -185,7 +185,9 @@ export default function MedicinePartnersPage() {
             <div className="text-green-100">Pharmacy Partners</div>
           </Card>
           <Card className="p-6 text-center bg-gradient-to-br from-[#10b981] to-[#059669] text-white">
-            <Heart className="h-10 w-10 mx-auto mb-4" />
+            <div className="relative w-16 h-16 mx-auto mb-4">
+              <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+            </div>
             <div className="text-3xl font-bold mb-2">
               {stats.customersServed >= 1000000 
                 ? `${(stats.customersServed / 1000000).toFixed(0)}M+`
@@ -258,14 +260,6 @@ export default function MedicinePartnersPage() {
                 </div>
 
                 <div className="pt-4 border-t border-gray-200">
-                  <div className="flex justify-between items-center text-sm">
-                    <div>
-                      <span className="text-gray-600">Impact:</span>
-                      <span className="font-semibold text-gray-900 ml-1">{partner.impact}</span>
-                    </div>
-                    <div className="text-gray-500">Since {partner.since}</div>
-                  </div>
-                </div>
 
                 <div className="mt-4 grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
                   <Button 

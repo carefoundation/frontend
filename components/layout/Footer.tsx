@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { Heart, Facebook, Twitter, Instagram, Youtube, MapPin, Phone, Mail } from 'lucide-react';
+import Image from 'next/image';
+import { Facebook, Twitter, Instagram, Youtube, MapPin, Phone, Mail } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export default function Footer() {
@@ -26,8 +27,8 @@ export default function Footer() {
           {/* Brand Section */}
           <div>
             <Link href="/" className="flex items-start gap-3 mb-4 cursor-pointer hover:opacity-80 transition-opacity">
-              <div className="bg-[#10b981] p-3 rounded-lg">
-                <Heart className="h-8 w-8 text-white fill-white" />
+              <div className="relative w-16 h-16 flex-shrink-0">
+                <Image src="/Logo.png" alt="Care Foundation Trust Logo" fill className="object-contain" />
               </div>
               <div>
                 <div className="text-gray-900 font-bold text-lg">Care Foundation Trust®</div>
@@ -144,7 +145,7 @@ export default function Footer() {
               </li>
               <li className="flex items-center gap-3">
                 <Phone className="h-5 w-5 text-gray-700 flex-shrink-0" />
-                <a href="tel:+919136521052" className="text-gray-600 hover:text-gray-900 transition-colors text-sm cursor-pointer">
+                <a href="https://wa.me/919136521052" target="_blank" rel="noopener noreferrer" className="text-gray-600 hover:text-gray-900 transition-colors text-sm cursor-pointer">
                   +91 9136521052
                 </a>
               </li>

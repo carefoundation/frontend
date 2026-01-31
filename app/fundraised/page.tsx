@@ -87,7 +87,9 @@ export default function FundraisedPage() {
             <div className="text-green-100">Campaigns Completed</div>
           </Card>
           <Card className="p-6 text-center bg-gradient-to-br from-[#10b981] to-[#059669] text-white">
-            <Heart className="h-10 w-10 mx-auto mb-4" />
+            <div className="relative w-16 h-16 mx-auto mb-4">
+              <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
+            </div>
             <div className="text-3xl font-bold mb-2">₹{(totalRaised / 100000).toFixed(1)}L+</div>
             <div className="text-green-100">Total Raised</div>
           </Card>

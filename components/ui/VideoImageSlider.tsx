@@ -258,7 +258,7 @@ export default function VideoImageSlider({
           <video
             ref={videoRef}
             src={currentItem.src}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-contain"
             onEnded={handleVideoEnd}
             onError={(e) => {
               console.error('Video load error:', e);

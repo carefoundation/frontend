@@ -53,6 +53,7 @@ export default function Home() {
   const [hospitalPartnerIndex, setHospitalPartnerIndex] = useState(0);
   const [medicinePartnerIndex, setMedicinePartnerIndex] = useState(0);
   const [pathologyPartnerIndex, setPathologyPartnerIndex] = useState(0);
+  const [trendingCampaignIndex, setTrendingCampaignIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -511,7 +512,7 @@ export default function Home() {
   return (
     <div className="bg-white">
       {/* Video/Image Slider Section - Directly below navbar */}
-      <div className="relative w-full h-[calc(100vh-6rem)] sm:h-[calc(100vh-7.5rem)] overflow-hidden mt-24 sm:mt-[7.5rem]">
+      <div className="relative w-full h-[calc(100vh-6rem)] sm:h-[calc(100vh-7.5rem)] overflow-hidden">
         <VideoImageSlider items={sliderItems} imageSlideDuration={5} />
       </div>
 
@@ -701,7 +702,7 @@ export default function Home() {
       </section>
 
       {/* Trending Fundraisers */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-[#ecfdf5]">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-10">
             <div>
@@ -719,17 +720,65 @@ export default function Home() {
               </Button>
             </Link>
           </div>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trendingCampaigns.length > 0 ? (
-              trendingCampaigns.map((campaign) => (
-                <CampaignCard key={campaign.id} {...campaign} />
-              ))
-            ) : (
-              <div className="col-span-3 text-center py-8 text-gray-500">
-                No trending campaigns at the moment
+          
+          {trendingCampaigns.length > 0 ? (
+            <div className="relative">
+              {/* Left Arrow */}
+              {trendingCampaigns.length > 3 && (
+                <button
+                  onClick={() => {
+                    setTrendingCampaignIndex((prev) =>
+                      prev === 0 ? Math.max(0, trendingCampaigns.length - 3) : prev - 1
+                    );
+                  }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-10 bg-[#10b981] text-white rounded-full p-3 shadow-xl hover:bg-[#059669] transition-all duration-200 flex-shrink-0"
+                  aria-label="Previous campaigns"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </button>
+              )}
+
+              {/* Cards Container */}
+              <div className="overflow-hidden w-full">
+                <div
+                  className="flex transition-transform duration-300 ease-in-out gap-6"
+                  style={{
+                    transform: `translateX(-${trendingCampaignIndex * (100 / 3)}%)`,
+                  }}
+                >
+                  {trendingCampaigns.map((campaign) => (
+                    <div
+                      key={campaign.id}
+                      className="flex-shrink-0 w-full lg:w-[calc(33.333%-1rem)]"
+                    >
+                      <CampaignCard {...campaign} />
+                    </div>
+                  ))}
+                </div>
               </div>
-            )}
-          </div>
+
+              {/* Right Arrow */}
+              {trendingCampaigns.length > 3 && (
+                <button
+                  onClick={() => {
+                    setTrendingCampaignIndex((prev) =>
+                      prev >= Math.max(0, trendingCampaigns.length - 3)
+                        ? 0
+                        : prev + 1
+                    );
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-10 bg-[#10b981] text-white rounded-full p-3 shadow-xl hover:bg-[#059669] transition-all duration-200 flex-shrink-0"
+                  aria-label="Next campaigns"
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-8 text-gray-500">
+              No trending campaigns at the moment
+            </div>
+          )}
         </div>
       </section>
 
@@ -818,7 +867,7 @@ export default function Home() {
         hospitalPartners.length > 0 ||
         medicinePartners.length > 0 ||
         pathologyPartners.length > 0) && (
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-[#ecfdf5]">
           <div className="w-full px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
@@ -959,28 +1008,14 @@ export default function Home() {
                                   </div>
                                 )}
 
-                              {/* Impact */}
-                              <div className="mb-3 pt-3 border-t border-gray-200">
-                                <div className="flex justify-between items-center text-xs">
-                                  <span className="text-gray-600">Impact:</span>
-                                  <span className="font-semibold text-gray-900">
-                                    {partner.impact}
-                                  </span>
-                                </div>
-                                <div className="text-xs text-gray-500 mt-1">
-                                  Since {partner.since}
-                                </div>
-                              </div>
 
                               {/* Action Buttons */}
                               <div
                                 className="grid grid-cols-2 gap-2 mt-3"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="w-full text-xs"
+                                <button
+                                  className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     router.push(
@@ -988,25 +1023,24 @@ export default function Home() {
                                     );
                                   }}
                                 >
-                                  <Ticket className="h-3 w-3 mr-1" />
+                                  <Ticket className="h-3 w-3" />
                                   Consult Now
-                                </Button>
+                                </button>
                                 <button
                                   className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
                                   onClick={(e) => {
                                     e.stopPropagation();
+                                    const shareUrl = `${window.location.origin}/partners/health/${partner._id || partner.id}`;
                                     if (navigator.share) {
                                       navigator
                                         .share({
                                           title: partner.name || "Partner",
                                           text: `Check out ${partner.name || "this partner"}`,
-                                          url: `${window.location.origin}/partners/food/${partner._id || partner.id}`,
+                                          url: shareUrl,
                                         })
                                         .catch(() => {});
                                     } else {
-                                      navigator.clipboard.writeText(
-                                        `${window.location.origin}/partners/food/${partner._id || partner.id}`,
-                                      );
+                                      navigator.clipboard.writeText(shareUrl);
                                       showToast(
                                         "Link copied to clipboard!",
                                         "success",
@@ -1156,18 +1190,6 @@ export default function Home() {
                                   </div>
                                 )}
 
-                              {/* Impact */}
-                              <div className="mb-3 pt-3 border-t border-gray-200">
-                                <div className="flex justify-between items-center text-xs">
-                                  <span className="text-gray-600">Impact:</span>
-                                  <span className="font-semibold text-gray-900">
-                                    {partner.impact}
-                                  </span>
-                                </div>
-                                <div className="text-xs text-gray-500 mt-1">
-                                  Since {partner.since}
-                                </div>
-                              </div>
 
                               {/* Action Buttons */}
                               <div
@@ -1192,18 +1214,17 @@ export default function Home() {
                                   className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
                                   onClick={(e) => {
                                     e.stopPropagation();
+                                    const shareUrl = `${window.location.origin}/partners/food/${partner._id || partner.id}`;
                                     if (navigator.share) {
                                       navigator
                                         .share({
                                           title: partner.name || "Partner",
                                           text: `Check out ${partner.name || "this partner"}`,
-                                          url: `${window.location.origin}/partners/health/${partner._id || partner.id}`,
+                                          url: shareUrl,
                                         })
                                         .catch(() => {});
                                     } else {
-                                      navigator.clipboard.writeText(
-                                        `${window.location.origin}/partners/health/${partner._id || partner.id}`,
-                                      );
+                                      navigator.clipboard.writeText(shareUrl);
                                       showToast(
                                         "Link copied to clipboard!",
                                         "success",
@@ -1370,10 +1391,8 @@ export default function Home() {
                                 className="grid grid-cols-2 gap-2 mt-3"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="w-full text-xs"
+                                <button
+                                  className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     router.push(
@@ -1381,25 +1400,24 @@ export default function Home() {
                                     );
                                   }}
                                 >
-                                  <Ticket className="h-3 w-3 mr-1" />
+                                  <Ticket className="h-3 w-3" />
                                   Consult Now
-                                </Button>
+                                </button>
                                 <button
                                   className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
                                   onClick={(e) => {
                                     e.stopPropagation();
+                                    const shareUrl = `${window.location.origin}/partners/hospital/${partner._id || partner.id}`;
                                     if (navigator.share) {
                                       navigator
                                         .share({
                                           title: partner.name || "Partner",
                                           text: `Check out ${partner.name || "this partner"}`,
-                                          url: `${window.location.origin}/partners/medicine/${partner._id || partner.id}`,
+                                          url: shareUrl,
                                         })
                                         .catch(() => {});
                                     } else {
-                                      navigator.clipboard.writeText(
-                                        `${window.location.origin}/partners/medicine/${partner._id || partner.id}`,
-                                      );
+                                      navigator.clipboard.writeText(shareUrl);
                                       showToast(
                                         "Link copied to clipboard!",
                                         "success",
@@ -1566,10 +1584,8 @@ export default function Home() {
                                 className="grid grid-cols-2 gap-2 mt-3"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="w-full text-xs"
+                                <button
+                                  className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
                                   onClick={(e) => {
                                     e.stopPropagation();
                                     router.push(
@@ -1577,25 +1593,24 @@ export default function Home() {
                                     );
                                   }}
                                 >
-                                  <Ticket className="h-3 w-3 mr-1" />
+                                  <Ticket className="h-3 w-3" />
                                   Consult Now
-                                </Button>
+                                </button>
                                 <button
                                   className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
                                   onClick={(e) => {
                                     e.stopPropagation();
+                                    const shareUrl = `${window.location.origin}/partners/medicine/${partner._id || partner.id}`;
                                     if (navigator.share) {
                                       navigator
                                         .share({
                                           title: partner.name || "Partner",
                                           text: `Check out ${partner.name || "this partner"}`,
-                                          url: `${window.location.origin}/partners/medicine/${partner._id || partner.id}`,
+                                          url: shareUrl,
                                         })
                                         .catch(() => {});
                                     } else {
-                                      navigator.clipboard.writeText(
-                                        `${window.location.origin}/partners/medicine/${partner._id || partner.id}`,
-                                      );
+                                      navigator.clipboard.writeText(shareUrl);
                                       showToast(
                                         "Link copied to clipboard!",
                                         "success",
@@ -1780,18 +1795,17 @@ export default function Home() {
                                   className="w-full bg-[#10b981] hover:bg-[#059669] text-white font-semibold text-xs py-2 px-2 rounded-lg flex items-center justify-center gap-1 transition-all duration-200 shadow-md hover:shadow-lg"
                                   onClick={(e) => {
                                     e.stopPropagation();
+                                    const shareUrl = `${window.location.origin}/partners/pathology/${partner._id || partner.id}`;
                                     if (navigator.share) {
                                       navigator
                                         .share({
                                           title: partner.name || "Partner",
                                           text: `Check out ${partner.name || "this partner"}`,
-                                          url: `${window.location.origin}/partners/pathology/${partner._id || partner.id}`,
+                                          url: shareUrl,
                                         })
                                         .catch(() => {});
                                     } else {
-                                      navigator.clipboard.writeText(
-                                        `${window.location.origin}/partners/pathology/${partner._id || partner.id}`,
-                                      );
+                                      navigator.clipboard.writeText(shareUrl);
                                       showToast(
                                         "Link copied to clipboard!",
                                         "success",

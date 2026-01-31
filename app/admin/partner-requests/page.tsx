@@ -477,12 +477,20 @@ export default function PartnerRequestsPage() {
             <Button
               variant="ghost"
               size="sm"
-              className="text-red-600 hover:text-red-700 hover:bg-red-50"
-              onClick={() => handleDeleteClick(row)}
+              className="text-red-600 hover:text-red-700 hover:bg-red-50 cursor-pointer"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                handleDeleteClick(row);
+              }}
               disabled={updating === (row._id || row.id)}
               title="Delete"
             >
-              <Trash2 className="h-4 w-4" />
+              {updating === (row._id || row.id) ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Trash2 className="h-4 w-4" />
+              )}
             </Button>
           </div>
         )}
@@ -552,6 +560,18 @@ export default function PartnerRequestsPage() {
             message={`Are you sure you want to reject "${selectedRequest.name}"? This action cannot be undone.`}
             onConfirm={handleRejectConfirm}
             confirmText="Reject"
+            variant="danger"
+          />
+          <ConfirmModal
+            isOpen={deleteModalOpen}
+            onClose={() => {
+              setDeleteModalOpen(false);
+              setSelectedRequest(null);
+            }}
+            title="Delete Partner Request"
+            message={`Are you sure you want to delete "${selectedRequest.name}"? This action cannot be undone and all data will be permanently removed.`}
+            onConfirm={handleDeleteConfirm}
+            confirmText="Delete"
             variant="danger"
           />
         </>
