@@ -516,7 +516,7 @@ export default function Home() {
         <VideoImageSlider items={sliderItems} imageSlideDuration={5} />
       </div>
 
-      {/* Hero Section */}
+      {/* Hero Sectionerty */}
       <section className="relative bg-gradient-to-br from-[#ecfdf5] via-white to-[#ecfdf5] py-8 md:py-20 lg:py-32">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
