@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect, useRef } from 'react';
-import { Heart, Menu, X, User, LogIn, LogOut, ChevronDown, Info, Target, Users, Award, FileText, TrendingUp, PlusCircle, FolderOpen, UtensilsCrossed, Stethoscope, Handshake, UserPlus, Calendar, LayoutDashboard, Star, BookOpen, Building2, Pill, Microscope, Mail, Phone, MapPin } from 'lucide-react';
+import { Heart, Menu, X, User, LogIn, LogOut, ChevronDown, Info, Target, Users, Award, FileText, TrendingUp, PlusCircle, FolderOpen, UtensilsCrossed, Stethoscope, Handshake, UserPlus, Calendar, LayoutDashboard, Star, BookOpen, Building2, Pill, Microscope, Mail, Phone, MapPin, MessageCircle } from 'lucide-react';
 import AnimatedHamburger from '../ui/AnimatedHamburger';
 import Button from '../ui/Button';
 import { checkAdminSession, clearAdminSession } from '@/lib/auth';
@@ -191,15 +191,15 @@ export default function Header() {
             {/* Left Side - Address, Email, Contact */}
             <div className="flex flex-wrap items-center gap-3 sm:gap-4 lg:gap-6">
               <a 
-                href="https://maps.google.com/?q=1106+Alexander+Tower+Sai+World+Empire+Navi+Mumbai+410210" 
+                href="https://share.google/7SxtD2S5bGdQV7Ak8" 
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 hover:text-gray-200 transition-colors"
               >
                 <MapPin className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
-                <span className="hidden xl:inline">1106, Alexander Tower, Sai World Empire, Navi Mumbai - 410210</span>
+                <span className="hidden xl:inline"> Location</span>
                 <span className="hidden md:inline xl:hidden">Navi Mumbai - 410210</span>
-                <span className="md:hidden">Address</span>
+                <span className="md:hidden">Location</span>
               </a>
               <a 
                 href="mailto:carefoundationtrustorg@gmail.com" 
@@ -215,9 +215,9 @@ export default function Header() {
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 hover:text-gray-200 transition-colors"
               >
-                <Phone className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
-                <span className="hidden sm:inline">+91 9136521052</span>
-                <span className="sm:hidden">Call</span>
+                <MessageCircle className="h-3 w-3 sm:h-3.5 sm:w-3.5 flex-shrink-0" />
+                <span className="hidden sm:inline">Chatbot</span>
+                <span className="sm:hidden">Chat</span>
               </a>
             </div>
 
@@ -491,7 +491,21 @@ export default function Header() {
                 <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-[#10b981] group-hover:w-full transition-all duration-300"></span>
               </Link>
             ))}
+
+<div className=" lg:flex items-center gap-4">
+            <Link href="/donate">
+              <Button 
+                size="sm" 
+                className="bg-[#10b981] hover:bg-[#059669] text-white font-medium shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                Donate
+              </Button>
+            </Link>
           </div>
+          </div>
+
+         
+          
 
           {/* Desktop Auth Buttons */}
           <div className="hidden lg:flex items-center gap-4">
@@ -526,8 +540,16 @@ export default function Header() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="lg:hidden">
+          {/* Mobile Menu Button and Donate */}
+          <div className="lg:hidden flex items-center gap-3">
+            <Link href="/donate">
+              <Button 
+                size="sm" 
+                className="bg-[#10b981] hover:bg-[#059669] text-white font-medium shadow-md hover:shadow-lg transition-all duration-200"
+              >
+                Donate
+              </Button>
+            </Link>
             <AnimatedHamburger
               isOpen={isMenuOpen}
               onClick={toggleMenu}
@@ -665,6 +687,17 @@ export default function Header() {
                 {link.label}
               </button>
             ))}
+            
+            {/* Mobile Donate Button */}
+            <div className="pt-4 border-t border-gray-200 px-4">
+              <Button 
+                className="w-full justify-center bg-[#10b981] hover:bg-[#059669] text-white font-medium shadow-md hover:shadow-lg transition-all duration-200"
+                onClick={() => handleMobileLinkClick('/donate')}
+              >
+                Donate
+              </Button>
+            </div>
+            
             <div className="pt-4 border-t border-gray-200 space-y-2 px-4">
               {isLoggedIn ? (
                 <>

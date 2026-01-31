@@ -148,7 +148,7 @@ export default function CreateFundraiserPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-16">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6">
         <div className="max-w-4xl mx-auto">
           {/* Page Header */}
           <div className="text-center mb-12">
@@ -161,28 +161,52 @@ export default function CreateFundraiserPage() {
 
           {/* Progress Steps */}
           <div className="mb-8">
-            <div className="flex items-center justify-between mb-4">
-              {[1, 2, 3].map((step) => (
-                <div key={step} className="flex items-center flex-1">
-                  <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold ${
-                    currentStep >= step
-                      ? 'bg-[#10b981] text-white'
-                      : 'bg-gray-200 text-gray-600'
-                  }`}>
-                    {step}
-                  </div>
-                  {step < 3 && (
-                    <div className={`flex-1 h-1 mx-2 ${
-                      currentStep > step ? 'bg-[#10b981]' : 'bg-gray-200'
-                    }`} />
-                  )}
+            <div className="flex items-center mb-4">
+              {/* Step 1 */}
+              <div className="flex flex-col items-center flex-1">
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold ${
+                  currentStep >= 1
+                    ? 'bg-[#10b981] text-white'
+                    : 'bg-gray-200 text-gray-600'
+                }`}>
+                  1
                 </div>
-              ))}
-            </div>
-            <div className="flex justify-between text-sm text-gray-600">
-              <span>Basic Info</span>
-              <span>Details</span>
-              <span>Review</span>
+                <span className="text-sm text-gray-600 mt-2">Basic Info</span>
+              </div>
+              
+              {/* Line 1-2 */}
+              <div className={`flex-1 h-1 mx-4 ${
+                currentStep > 1 ? 'bg-[#10b981]' : 'bg-gray-200'
+              }`} />
+              
+              {/* Step 2 */}
+              <div className="flex flex-col items-center flex-1">
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold ${
+                  currentStep >= 2
+                    ? 'bg-[#10b981] text-white'
+                    : 'bg-gray-200 text-gray-600'
+                }`}>
+                  2
+                </div>
+                <span className="text-sm text-gray-600 mt-2">Details</span>
+              </div>
+              
+              {/* Line 2-3 */}
+              <div className={`flex-1 h-1 mx-4 ${
+                currentStep > 2 ? 'bg-[#10b981]' : 'bg-gray-200'
+              }`} />
+              
+              {/* Step 3 */}
+              <div className="flex flex-col items-center flex-1">
+                <div className={`flex items-center justify-center w-10 h-10 rounded-full font-semibold ${
+                  currentStep >= 3
+                    ? 'bg-[#10b981] text-white'
+                    : 'bg-gray-200 text-gray-600'
+                }`}>
+                  3
+                </div>
+                <span className="text-sm text-gray-600 mt-2">Review</span>
+              </div>
             </div>
           </div>
 

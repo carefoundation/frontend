@@ -511,21 +511,20 @@ export default function Home() {
 
   return (
     <div className="bg-white">
-      {/* Video/Image Slider Section - Directly below navbar */}
       <div className="relative w-full md:h-[calc(100vh-6rem)] sm:h-[calc(100vh-7.5rem)] overflow-hidden">
         <VideoImageSlider items={sliderItems} imageSlideDuration={5} />
       </div>
 
       {/* Hero Sectionerty */}
-      <section className="relative bg-gradient-to-br from-[#ecfdf5] via-white to-[#ecfdf5] py-8 md:py-20 lg:py-32">
+      <section className="relative bg-gradient-to-br from-[#ecfdf5] via-white to-[#ecfdf5] py-6 md:py-20 lg:py-22">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div className="animate-slide-in">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4 md:mb-6 leading-tight">
                 Together We Can{" "}
                 <span className="text-[#10b981]">Save Lives</span>
               </h1>
-              <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+              <p className="text-xl text-gray-600 mb-6 md:mb-8 leading-relaxed">
                 Join thousands of compassionate donors making a real difference.
                 Support causes you care about and help create a better world.
               </p>
@@ -685,7 +684,7 @@ export default function Home() {
       </section>
 
       {/* Trust Indicators */}
-      <section className="py-16 bg-white">
+      <section className="py-8 md:py-16 bg-white">
         <div className="w-full px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {trustStats.map((stat, index) => (
@@ -702,9 +701,9 @@ export default function Home() {
       </section>
 
       {/* Trending Fundraisers */}
-      <section className="py-16 bg-[#ecfdf5]">
+      <section className="py-8 md:py-16 bg-[#ecfdf5]">
         <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center mb-10">
+          <div className="flex justify-between items-center mb-6 md:mb-10">
             <div>
               <h2 className="text-3xl font-bold text-gray-900 mb-2">
                 Trending Fundraisers
@@ -783,9 +782,9 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-gray-50">
+      <section className="py-8 md:py-16 bg-gray-50">
         <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 md:mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               How It Works
             </h2>
@@ -812,9 +811,9 @@ export default function Home() {
       </section>
 
       {/* Success Stories */}
-      <section className="py-16 bg-white">
+      <section className="py-8 md:py-16 bg-white">
         <div className="w-full px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-8 md:mb-12">
             <h2 className="text-3xl font-bold text-gray-900 mb-4">
               Success Stories
             </h2>
@@ -867,9 +866,9 @@ export default function Home() {
         hospitalPartners.length > 0 ||
         medicinePartners.length > 0 ||
         pathologyPartners.length > 0) && (
-        <section className="py-16 bg-[#ecfdf5]">
+        <section className="py-8 md:py-16 bg-[#ecfdf5]">
           <div className="w-full px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-12">
+            <div className="text-center mb-8 md:mb-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
                 Our Partners
               </h2>
@@ -880,8 +879,8 @@ export default function Home() {
 
             {/* Health Partners */}
             {healthPartners.length > 0 && (
-              <div className="mb-16">
-                <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+              <div className="mb-8 md:mb-16">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6 md:mb-8 text-center">
                   Doctor's for u
                 </h3>
                 <div className="relative">
@@ -1064,8 +1063,8 @@ export default function Home() {
 
             {/* Food Partners */}
             {foodPartners.length > 0 && (
-              <div className="mb-16">
-                <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+              <div className="mb-8 md:mb-16">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6 md:mb-8 text-center">
                   Food Partners
                 </h3>
                 <div className="relative">
@@ -1248,8 +1247,8 @@ export default function Home() {
 
             {/* Hospital Partners */}
             {hospitalPartners.length > 0 && (
-              <div className="mb-16">
-                <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+              <div className="mb-8 md:mb-16">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6 md:mb-8 text-center">
                   Hospital Partners
                 </h3>
                 <div className="relative">
@@ -1441,8 +1440,8 @@ export default function Home() {
 
             {/* Medicine/Pharmacy Partners */}
             {medicinePartners.length > 0 && (
-              <div className="mb-16">
-                <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+              <div className="mb-8 md:mb-16">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6 md:mb-8 text-center">
                   Medicine/Pharmacy Partners
                 </h3>
                 <div className="relative">
@@ -1634,8 +1633,8 @@ export default function Home() {
 
             {/* Pathology Lab Partners */}
             {pathologyPartners.length > 0 && (
-              <div className="mb-16">
-                <h3 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+              <div className="mb-8 md:mb-16">
+                <h3 className="text-2xl font-bold text-gray-900 mb-6 md:mb-8 text-center">
                   Pathology Lab Partners
                 </h3>
                 <div className="relative">
@@ -1831,7 +1830,7 @@ export default function Home() {
       )}
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-[#10b981] to-[#059669] text-white">
+      <section className="py-12 md:py-20 bg-gradient-to-r from-[#10b981] to-[#059669] text-white">
         <div className="w-full px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-4xl font-bold mb-4">
             Ready to Make a Difference?

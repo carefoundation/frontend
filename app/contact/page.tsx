@@ -77,7 +77,7 @@ export default function ContactPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-16">
+    <div className="min-h-screen bg-gray-50 pt-5">
       <div className="w-full px-4 sm:px-6 lg:px-8 py-16">
         {/* Page Header */}
         <div className="text-center mb-12">
@@ -215,8 +215,7 @@ export default function ContactPage() {
                   <div>
                     <h4 className="font-semibold text-gray-900 mb-1">Address</h4>
                     <p className="text-gray-600 text-sm leading-relaxed">
-                      1106, Alexander Tower, Sai World Empire, opposite Swapnapoorti Mhada colony, 
-                      valley Shilp Road, Navi Mumbai :- 410210. Sector 36, kharghar.
+                      Location
                     </p>
                     <a
                       href="https://maps.google.com/?q=1106+Alexander+Tower+Sai+World+Empire+Navi+Mumbai+410210"

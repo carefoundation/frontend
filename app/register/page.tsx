@@ -237,19 +237,13 @@ export default function RegisterPage() {
   const currentBenefits = selectedRole ? benefits[selectedRole] : [];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#ecfdf5] via-white to-[#ecfdf5] py-6 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#ecfdf5] via-white to-[#ecfdf5] py-20 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
           {/* Left Side - Attractive Content */}
           <div className="hidden lg:block lg:pl-8">
             <div className="sticky top-6 max-w-lg">
-              {/* Logo */}
-              <Link href="/" className="inline-flex items-center gap-2 mb-6">
-                <div className="relative w-10 h-10">
-                  <Image src="/Logo.png" alt="Logo" fill className="object-contain" />
-                </div>
-                <span className="text-2xl font-bold text-gray-900">Care Foundation</span>
-              </Link>
+              
 
               {step === 'role' ? (
                 <div>

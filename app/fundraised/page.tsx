@@ -69,7 +69,7 @@ export default function FundraisedPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-16">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-5">
         {/* Page Header */}
         <div className="text-center mb-12">
           <Trophy className="h-16 w-16 text-[#10b981] mx-auto mb-6" />

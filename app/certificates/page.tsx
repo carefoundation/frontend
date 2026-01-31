@@ -83,7 +83,7 @@ export default function CertificatesPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 pt-16 flex items-center justify-center">
+      <div className="min-h-screen bg-gray-50 pt-15 flex items-center justify-center">
         <Loader2 className="h-8 w-8 animate-spin text-[#10b981]" />
       </div>
     );

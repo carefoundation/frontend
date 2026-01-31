@@ -91,11 +91,11 @@ export default function FundraiserPage() {
 
   return (
     <div className="min-h-screen bg-gray-50 pt-16">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-12">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-5">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">Active Fundraisers</h1>
-          <p className="text-gray-600">Discover and support active fundraising campaigns</p>
+          <h1 className="text-4xl font-bold text-center text-gray-900 mb-2">Active Fundraisers</h1>
+          <p className="text-gray-600 text-center">Discover and support active fundraising campaigns</p>
         </div>
         
         {/* Stats Cards */}
