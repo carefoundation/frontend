@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Users, Target, Award, Calendar, TrendingUp } from 'lucide-react';
+import { Users, Target, Award, Calendar, TrendingUp, Heart } from 'lucide-react';
 import Footer from '@/components/layout/Footer';
 import Card from '@/components/ui/Card';
 

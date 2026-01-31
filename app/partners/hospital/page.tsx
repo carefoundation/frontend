@@ -260,8 +260,7 @@ export default function HospitalPartnersPage() {
                 </div>
 
                 <div className="pt-4 border-t border-gray-200">
-
-                <div className="mt-4 grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
+                  <div className="mt-4 grid grid-cols-2 gap-2" onClick={(e) => e.stopPropagation()}>
                   <Button 
                     variant="outline" 
                     size="sm" 
@@ -294,6 +293,7 @@ export default function HospitalPartnersPage() {
                     <Share2 className="h-4 w-4" />
                     Share
                   </button>
+                  </div>
                 </div>
               </div>
             </Card>
