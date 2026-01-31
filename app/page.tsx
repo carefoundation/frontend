@@ -21,7 +21,7 @@ import {
     TrendingUp,
     User,
     Users,
-    X
+    X,
 } from "lucide-react";
 import dynamic from "next/dynamic";
 import Image from "next/image";
@@ -409,7 +409,7 @@ export default function Home() {
   const howItWorks = [
     {
       step: "1",
-      title: "Vishal Cause",
+      title: "Choose a Cause",
       description:
         "Browse through campaigns and find a cause that resonates with you.",
       icon: Heart,
