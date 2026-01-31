@@ -512,7 +512,7 @@ export default function Home() {
   return (
     <div className="bg-white">
       {/* Video/Image Slider Section - Directly below navbar */}
-      <div className="relative w-full h-[calc(100vh-6rem)] sm:h-[calc(100vh-7.5rem)] overflow-hidden">
+      <div className="relative w-full md:h-[calc(100vh-6rem)] sm:h-[calc(100vh-7.5rem)] overflow-hidden">
         <VideoImageSlider items={sliderItems} imageSlideDuration={5} />
       </div>
 
