@@ -10,9 +10,6 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
       - name: Deploy Frontend to VPS
         uses: appleboy/ssh-action@v1
         with:
@@ -22,10 +19,11 @@ jobs:
           script: |
             set -e
             cd /var/www/carefoundation/frontend
-            git pull origin main
+            # Reset any local changes and pull fresh
+            git fetch --all
+            git reset --hard origin/main
+            git pull origin main --force
             npm install
             rm -rf .next
             npm run build
             pm2 restart care-frontend
-
-
