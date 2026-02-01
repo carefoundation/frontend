@@ -1,7 +1,7 @@
 // Admin credentials
 export const ADMIN_CREDENTIALS = {
-  email: 'admin@care.com',
-  password: 'admin123',
+  email: 'adminaziz@care.com',
+  password: '@Karbala78652',
 };
 
 // Check if user is admin

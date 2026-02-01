@@ -180,7 +180,7 @@ export default function ProfilePage() {
               )}
             </div>
             <h2 className="text-xl font-bold text-gray-900 mb-1">{formData.name || 'Admin User'}</h2>
-            <p className="text-gray-600 mb-4">{formData.email || 'admin@care.com'}</p>
+            <p className="text-gray-600 mb-4">{formData.email || 'adminaziz@care.com'}</p>
             <input
               type="file"
               accept="image/*"
